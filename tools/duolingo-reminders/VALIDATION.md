@@ -1,5 +1,25 @@
 # Bundle validation — 2026-10-22
 
+## Automatic upstream synchronization
+
+- Thirteen regression tests cover real Git merges, protected workflow and
+  reminder preservation, mod revisions, unchanged-source no-ops, conflicting
+  code, Duolingo target changes, unreleased-source pins, catalog preservation,
+  manifest normalization, stale outputs, and Manager timestamp formatting.
+  The suite passed locally and on the Ubuntu Actions runner.
+- An isolated clone exercised the actual upstream network fetch, unchanged
+  no-op, forced preparation of 1.47.0-mod.3, release-overlay build, catalog
+  export, all eight coordinator scenarios, and final distribution verification.
+  All seven reminder implementation/test/build files retained their hashes.
+- The scratch artifact was 5,918,648 bytes, SHA-256
+  `974e29ab7220b71469515dd66c72a788d266f267e1538c9fe77042f061cb2f8c`.
+  It was not published from the scratch clone. Runner builds can differ in
+  compressed bytes; the recorded source revision and loaded catalog establish
+  which code was built.
+- Publication is performed only after build and final verification. Full-source
+  compilation is required for upstream main commits without a matching public
+  release; older release binaries are rejected for those commits.
+
 ## Display name update 1.47.0-mod.2
 
 Artifact: `dist/patches-1.47.0-mod.2.mpp` (5,929,597 bytes).

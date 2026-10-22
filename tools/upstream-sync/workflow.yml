@@ -75,6 +75,13 @@ jobs:
             17
             21
 
+      - name: Set up Android SDK command-line tools
+        if: steps.prepare.outputs.changed == 'true'
+        uses: android-actions/setup-android@v3
+        with:
+          packages: ''
+          log-accepted-android-sdk-licenses: false
+
       - name: Install the Android compile platform
         if: steps.prepare.outputs.changed == 'true'
         run: |

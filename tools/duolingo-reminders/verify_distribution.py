@@ -133,7 +133,7 @@ def verify(root: Path, loaded_catalog: Path | None = None) -> None:
         manifest = manifest.replace("\r\n ", "").replace("\n ", "")
         attributes = dict(line.split(": ", 1) for line in manifest.splitlines() if ": " in line)
         assert attributes["Version"] == version, "Manifest and endpoint versions differ"
-        assert attributes["Name"] == "BeForU Morphe Patches"
+        assert attributes["Name"] == "Hoodles Morphe Patches (Modded)"
         assert app_version in attributes["Description"]
         assert attributes["Source"] == "https://github.com/BeForU/morphe-patches"
         assert attributes["Patcher-Version"] == "1.14.1"

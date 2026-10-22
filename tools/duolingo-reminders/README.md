@@ -1,6 +1,6 @@
 # Unified Morphe bundle with Duolingo updates
 
-`dist/patches-1.47.0-mod.1.mpp` is **BeForU Morphe Patches 1.47.0-mod.1**. It includes the
+`dist/patches-1.47.0-mod.2.mpp` is **Hoodles Morphe Patches (Modded) 1.47.0-mod.2**. It includes the
 upstream **Hoodles Morphe Patches 1.47.0** catalog, rebuilt Duolingo sources
 targeting **6.102.4** (`com.duolingo`), the login fix from
 [PR #1117](https://github.com/hoo-dles/morphe-patches/pull/1117), and the optional
@@ -8,10 +8,13 @@ targeting **6.102.4** (`com.duolingo`), the login fix from
 including **MicroG integration**, are available from one source.
 
 Add `https://github.com/BeForU/morphe-patches` under Morphe Manager's
-**Sources → + → Remote**, or [use the add-source link](https://morphe.software/add-source?github=BeForU/morphe-patches&name=BeForU%20Morphe%20Patches).
+**Sources → + → Remote**, or [use the add-source link](https://morphe.software/add-source?github=BeForU/morphe-patches&name=Hoodles%20Morphe%20Patches%20%28Modded%29).
 An existing remote source for this fork can use **Update** to fetch version
-1.47.0-mod.1, including a source previously named **Duolingo Learning Reminders**
-or previously publishing version **1.49.0**.
+1.47.0-mod.2, including a source previously named **Duolingo Learning Reminders**
+or **BeForU Morphe Patches**. Manager preserves a saved custom source name. If
+the source card still shows the old label, use its pencil **Rename** action
+under **Sources** and enter **Hoodles Morphe Patches (Modded)**. Removing and
+adding the source again is unnecessary.
 Choose an original Duolingo 6.102.4 APK and select **Enable Premium**, **MicroG
 integration**, and **Restore learning reminders** from this updated source.
 The reminder patch is disabled by default; use Expert mode if needed to show it.
@@ -27,12 +30,12 @@ An existing local source must be replaced by adding the repository once;
 disable or delete the old local reminder source afterwards. Local `.mpp` import
 also works, but it does not receive remote updates. Archived reminder-only
 artifacts remain available: 1.48.0 targets 6.102.4 and 1.0.0 targets 6.98.4.
-The previously published unified 1.49.0 bundle is also retained as an archive.
+The previously published unified 1.49.0 and 1.47.0-mod.1 bundles are also retained as archives.
 
 Fork versions follow **`<upstream version>-mod.<revision>`**. The current
-`1.47.0-mod.1` identifies upstream 1.47.0 with the first custom revision;
-subsequent custom fixes use `1.47.0-mod.2`. Incorporating upstream 1.48.0 starts
-at `1.48.0-mod.1`.
+`1.47.0-mod.2` identifies upstream 1.47.0 with the second custom revision;
+the first was `1.47.0-mod.1`, and subsequent custom fixes use `1.47.0-mod.3`.
+Incorporating upstream 1.48.0 starts at `1.48.0-mod.1`.
 
 The pinned baseline version, download URL, and SHA-256 are stored in
 [`upstream.json`](upstream.json). The build and distribution verifier require
@@ -98,7 +101,7 @@ classpath: the APK supplies Android framework resources needed by the engine.
 ```powershell
 # Replace the variables with paths to your downloaded files and compiled validator.
 & "$JdkHome/bin/java.exe" -Xmx8g -cp "$hostJar;$managerApk;$validatorJar" ValidateKt `
-    $bundle $originalBaseApk $temporaryWork $validationOutput SUPER 1.47.0-mod.1 6.102.4
+    $bundle $originalBaseApk $temporaryWork $validationOutput SUPER 1.47.0-mod.2 6.102.4
 python tools/duolingo-reminders/verify_distribution.py `
     --loaded-catalog "$validationOutput/bundle-metadata.json"
 ```

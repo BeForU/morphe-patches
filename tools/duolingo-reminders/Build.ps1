@@ -136,7 +136,7 @@ finally { $classInput.Dispose(); $classOutput.Dispose() }
 Invoke-Checked $java @('-cp', $d8, 'com.android.tools.r8.D8', '--release', '--min-api', '26', '--lib', $androidJar, '--classpath', $DesktopJar, '--output', $patchDex, $classesJar)
 $manifest = Join-Path $work 'MANIFEST.MF'
 @"
-Name: BeForU Morphe Patches
+Name: Hoodles Morphe Patches (Modded)
 Description: Hoodles $($upstream.version) patches with updated Duolingo $appVersion and local reminder fallback
 Version: $BundleVersion
 Timestamp: 1792627200000

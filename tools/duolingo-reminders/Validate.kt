@@ -5,7 +5,7 @@
  * Run ValidateKt with patcher-host.jar, the Manager APK (framework resources), and
  * the compiled validator JAR on the Java classpath, then these arguments:
  *   <bundle.mpp> <original-base.apk> <temporary-work-dir> <output-dir> [SUPER|MAX]
- *   [expected-bundle-version=1.47.0-mod.1] [expected-app-version=6.102.4]
+ *   [expected-bundle-version=1.47.0-mod.2] [expected-app-version=6.102.4]
  * The temporary work directory is replaced by Patcher; choose an expendable path.
  * Output contains the public bundle metadata snapshot and serialized patched DEX.
  * The resource APK remains under <temporary-work-dir>/patched/resources.apk.
@@ -30,7 +30,7 @@ fun json(v: Any?): String = when(v) {
 }
 fun main(args: Array<String>) = runBlocking {
     require(args.size >= 4) { "Expected bundle, original APK, temporary work directory, and output directory" }
-    val expectedBundleVersion = args.getOrElse(5) { "1.47.0-mod.1" }
+    val expectedBundleVersion = args.getOrElse(5) { "1.47.0-mod.2" }
     val expectedAppVersion = args.getOrElse(6) { "6.102.4" }
     val patchJar = File(args[0])
     val patches = loadPatchesFromJar(setOf(patchJar)).toSet()

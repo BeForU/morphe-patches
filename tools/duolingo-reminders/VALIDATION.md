@@ -1,5 +1,25 @@
 # Bundle validation — 2026-10-22
 
+## Display name update 1.47.0-mod.2
+
+Artifact: `dist/patches-1.47.0-mod.2.mpp` (5,929,597 bytes).
+
+SHA-256:
+`96ff3de21f17c1cb2b39fc0f1bee60675a72aa51b712009c0d1786b5b317bfc0`
+
+- The manifest Name is **Hoodles Morphe Patches (Modded)** and Version is
+  **1.47.0-mod.2**. Both the standalone and normal Gradle build configurations
+  use the requested bundle name, as do the add-source links.
+- All 925 ZIP entry names match 1.47.0-mod.1. Only the manifest payload changed,
+  with Name and Version the only differing attributes. All patch JVM classes,
+  Manager DEX, extensions, and resources are byte-for-byte identical.
+- The distribution verifier passed manifest/endpoint/catalog/version and ZIP
+  integrity checks, including comparison with the previously loaded 79-patch
+  catalog. Application tests were not repeated for this metadata-only change.
+- Manager 2.0.0 adopts the manifest Name when updating a source, but preserves
+  a saved custom display name. Existing aliases can be changed through
+  **Sources → Rename** without removing the source.
+
 ## Upstream-based version 1.47.0-mod.1
 
 Artifact: `dist/patches-1.47.0-mod.1.mpp` (5,929,591 bytes).

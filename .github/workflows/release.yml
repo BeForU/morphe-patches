@@ -6,6 +6,7 @@ on:
 
 jobs:
   release:
+    if: github.repository == 'hoo-dles/morphe-patches'
     name: Release
     permissions:
       contents: write

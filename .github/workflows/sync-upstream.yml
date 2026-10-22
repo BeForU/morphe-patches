@@ -1,0 +1,118 @@
+name: Sync upstream and publish modded patches
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+    inputs:
+      rebuild:
+        description: Rebuild even when upstream main is unchanged
+        required: false
+        default: false
+        type: boolean
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/sync-upstream.yml
+      - tools/upstream-sync/**
+
+permissions:
+  contents: write
+  packages: read
+
+concurrency:
+  group: upstream-sync-main
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.repository == 'BeForU/morphe-patches'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out the publishing branch
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Test synchronization rules
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s tools/upstream-sync -p 'test_*.py'
+
+      - name: Configure the publishing identity
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+      - name: Prepare the upstream merge
+        id: prepare
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REBUILD_REQUESTED: ${{ inputs.rebuild }}
+        run: |
+          set -euo pipefail
+          arguments=(prepare --plan "$RUNNER_TEMP/upstream-plan.json")
+          if [[ "$EVENT_NAME" == 'push' || "$REBUILD_REQUESTED" == 'true' ]]; then
+            arguments+=(--rebuild)
+          fi
+          python3 tools/upstream-sync/sync.py "${arguments[@]}"
+
+      - name: Set up build JDKs
+        if: steps.prepare.outputs.changed == 'true'
+        uses: actions/setup-java@v5.6.0
+        with:
+          distribution: temurin
+          java-version: |
+            17
+            21
+
+      - name: Install the Android compile platform
+        if: steps.prepare.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          sdkmanager 'platforms;android-36'
+
+      - name: Build and inspect the complete patch bundle
+        if: steps.prepare.outputs.changed == 'true'
+        id: build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          pwsh -NoLogo -NoProfile -File tools/upstream-sync/Build-CI.ps1 -PlanPath "$RUNNER_TEMP/upstream-plan.json"
+
+      - name: Verify and prepare the public source update
+        if: steps.prepare.outputs.changed == 'true'
+        env:
+          BUNDLE_PATH: ${{ steps.build.outputs.bundle_path }}
+          CATALOG_PATH: ${{ steps.build.outputs.catalog_path }}
+          BUILD_MODE: ${{ steps.build.outputs.build_mode }}
+        run: |
+          set -euo pipefail
+          python3 tools/upstream-sync/sync.py finalize \
+            --plan "$RUNNER_TEMP/upstream-plan.json" \
+            --bundle "$BUNDLE_PATH" \
+            --catalog "$CATALOG_PATH" \
+            --build-mode "$BUILD_MODE"
+
+      - name: Commit and publish the verified update
+        if: steps.prepare.outputs.changed == 'true'
+        env:
+          MOD_VERSION: ${{ steps.prepare.outputs.version }}
+        run: |
+          set -euo pipefail
+          [[ "$MOD_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-mod\.[1-9][0-9]*$ ]]
+          git add -u
+          git add -- "dist/patches-$MOD_VERSION.mpp" tools/upstream-sync/state.json
+          git diff --cached --check
+          git commit -m "chore: sync upstream and publish $MOD_VERSION [skip ci]"
+          git push origin HEAD:main

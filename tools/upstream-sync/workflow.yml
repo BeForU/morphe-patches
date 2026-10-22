@@ -15,7 +15,14 @@ on:
       - main
     paths:
       - .github/workflows/sync-upstream.yml
-      - tools/upstream-sync/**
+      - tools/upstream-sync/*.py
+      - tools/upstream-sync/*.ps1
+      - tools/upstream-sync/workflow.yml
+      - tools/duolingo-reminders/*.ps1
+      - tools/duolingo-reminders/*.kt
+      - tools/duolingo-reminders/verify_distribution.py
+      - patches/src/main/kotlin/hoodles/morphe/patches/duolingo/**
+      - extensions/duolingo/**
 
 permissions:
   contents: write

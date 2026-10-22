@@ -35,6 +35,8 @@ PROTECTED = (
 CUSTOM = (
     "extensions/duolingo/",
     "patches/src/main/kotlin/hoodles/morphe/patches/duolingo/misc/notifications/",
+    "patches/src/main/kotlin/hoodles/morphe/patches/all/microg/MicroGSupportPatch.kt",
+    "patches/src/main/kotlin/hoodles/morphe/patches/all/microg/FirebaseInstallationsSupportPatch.kt",
 )
 
 
@@ -96,12 +98,15 @@ def custom_hashes(root: Path) -> dict[str, str]:
         for name in git(root, "ls-files", "--", prefix).splitlines():
             path = root / name
             if not path.is_file():
-                raise SyncError(f"Required custom reminder file is missing: {name}")
+                raise SyncError(f"Required custom patch file is missing: {name}")
             result[name] = hashlib.sha256(path.read_bytes()).hexdigest()
     if not any("RestoreLearningRemindersPatch.kt" in name for name in result):
         raise SyncError("The custom learning reminder patch is missing.")
     if not any("LearningReminderFallback.java" in name for name in result):
         raise SyncError("The custom reminder runtime extension is missing.")
+    for required in (path for path in CUSTOM if not path.endswith("/")):
+        if required not in result:
+            raise SyncError(f"Required custom MicroG support file is missing: {required}")
     return result
 
 
@@ -252,7 +257,7 @@ def prepare(root: Path, plan_path: Path, rebuild: bool = False, remote: str = UP
         if git(root, "diff", "--name-only", "--diff-filter=U"):
             raise SyncError("Unresolved upstream merge conflicts remain.")
         if custom_hashes(root) != original_hashes:
-            raise SyncError("Upstream modified the custom reminder implementation; manual review is required.")
+            raise SyncError("Upstream modified the custom patch implementation; manual review is required.")
         if targets((root / COMPAT).read_text(encoding="utf-8")) != original_targets:
             raise SyncError("Upstream changed the validated Duolingo target; validate the new APK manually first.")
         if parity:
@@ -369,7 +374,7 @@ def finalize(root: Path, plan_path: Path, bundle: Path, catalog: Path, build_mod
     if build_mode == "release-overlay" and not plan["release_parity"]:
         raise SyncError("Release-overlay cannot publish unpublished main changes; full-source build is required.")
     if custom_hashes(root) != plan["custom_hashes"]:
-        raise SyncError("Custom reminder files changed after prepare.")
+        raise SyncError("Custom patch files changed after prepare.")
     if list(targets((root / COMPAT).read_text(encoding="utf-8"))) != plan["duolingo_targets"]:
         raise SyncError("The validated Duolingo target changed after prepare.")
     exported = normalize_catalog(json.loads(catalog.read_text(encoding="utf-8-sig")), plan["version"])

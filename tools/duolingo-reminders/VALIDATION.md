@@ -1,5 +1,44 @@
 # Bundle validation — 2026-10-22
 
+## Duolingo FIS identity fix 1.47.0-mod.6 — 2026-10-23
+
+Artifact: `dist/patches-1.47.0-mod.6.mpp`.
+SHA-256: `e9139273b2cce7cd7e87e75aa777527e02008d3bd2eaf6be2c80768cfbf2b756`.
+
+- Connected MicroG RE 7.2.2 had device registration, cloud messaging, and
+  Duolingo registration enabled. Its persistent process sent `register3` and
+  received `Error=FIS_AUTH_ERROR`; the app saw generic `SERVICE_NOT_AVAILABLE`.
+  RE already forwards the FIS auth extra, so no RE settings or global resets
+  were needed. The failed upstream FIS request had no usable auth token.
+- The original APK signer is `A00BB7D92E38909C2F6C04A80558890E52949CD9`;
+  the installed Manager-signed APK uses a different certificate. The direct
+  FIS HTTP client read that installed signer instead of MicroG's spoof metadata.
+- A controlled FIS create request using the installed signer reproduced
+  HTTP 403 / `API_KEY_ANDROID_APP_BLOCKED`. The same app configuration and
+  original certificate returned HTTP 200 with an auth token. Private API
+  values, installation credentials, and push tokens are not included here.
+- The patch changes only the two identity header invocations in `Lx1f;` for
+  Duolingo. Both literals come from metadata verified against the original
+  APK; other apps are skipped. Missing FIS is a no-op; ambiguous layouts stop
+  patching instead of guessing. Existing MicroG FCM registration is retained.
+- Actual Manager/Patcher 2.0.0 applied all five Duolingo patches and MicroG to
+  original 6.102.4 with both SUPER and MAX. `VerifyFirebaseIdentity.kt` confirmed
+  the original signer, two changed invokes, unchanged registers, operands,
+  branch offsets and exception ranges for both outputs. Nine header planner
+  regressions passed. The reminder startup bytecode audit also passed.
+- The real generated helpers passed `dalvikvm -Xverify:all` on the connected
+  Android 17 phone and produced exactly the original package/certificate
+  headers. This offline probe does not claim an installed-app FCM registration.
+- Nineteen upstream synchronization tests cover preservation of the exact
+  custom MicroG files as well as the reminder implementation. The public
+  overlay now recompiles MicroG integration; distribution checks require the
+  FIS class in both desktop and Manager DEX contents.
+
+The earlier 01:00 local reminder test reached `PRACTICE_ALARM`, but Android
+blocked `NotificationIntentService` from starting in the background. This FIS
+fix addresses remote registration; it does not fix that separate local service
+delivery issue or prove delivery of every server notification type.
+
 ## Automated full-source release 1.47.0-mod.5 — 2026-10-23
 
 Artifact: `dist/patches-1.47.0-mod.5.mpp` (5,687,040 bytes).

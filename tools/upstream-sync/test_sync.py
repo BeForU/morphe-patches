@@ -42,6 +42,7 @@ class MergeFixture(unittest.TestCase):
         self.put(self.upstream, "patches-bundle.json", json.dumps({"version": "1.47.0"}))
         self.put(self.upstream, "patches-list.json", json.dumps({"version": "1.47.0", "patches": []}))
         self.put(self.upstream, sync.COMPAT, 'object Compat {\n val DUOLINGO = Compatibility(\n targets = listOf(AppTarget("6.102.4"))\n )\n}\n')
+        self.put(self.upstream, sync.CUSTOM[2], "upstream compatibility=1\n" + "shared code\n" * 10 + "upstream MicroG hook\n")
         self.commit(self.upstream, "upstream base")
         self.baseline = command(self.upstream, "rev-parse", "HEAD")
         self.fork = self.directory / "fork"
@@ -58,6 +59,8 @@ class MergeFixture(unittest.TestCase):
         self.put(self.fork, sync.PIN, json.dumps({"version": "1.47.0", "sha256": "a" * 64}))
         self.put(self.fork, sync.CUSTOM[0] + "src/LearningReminderFallback.java", "custom runtime\n")
         self.put(self.fork, sync.CUSTOM[1] + "RestoreLearningRemindersPatch.kt", "custom patch\n")
+        self.put(self.fork, sync.CUSTOM[2], "upstream compatibility=1\n" + "shared code\n" * 10 + "custom FIS dependency\n")
+        self.put(self.fork, sync.CUSTOM[3], "custom FIS original identity helpers\n")
         self.commit(self.fork, "fork customization")
         self.head = command(self.fork, "rev-parse", "HEAD")
         self.plan_path = self.directory / "plan.json"
@@ -138,6 +141,57 @@ class MergeFixture(unittest.TestCase):
         with self.assertRaises(sync.SyncError):
             self.prepare()
         self.assertEqual(command(self.fork, "status", "--porcelain"), "")
+
+    def assert_microg_upstream_change_is_blocked(self, path):
+        original = (self.fork / path).read_bytes()
+        self.upstream_change(path, "changed upstream identity behavior\n")
+        with self.assertRaises(sync.SyncError):
+            self.prepare()
+        self.assertEqual(command(self.fork, "status", "--porcelain"), "")
+        self.assertEqual((self.fork / path).read_bytes(), original)
+
+    def test_microg_dependency_change_is_blocked(self):
+        self.assert_microg_upstream_change_is_blocked(sync.CUSTOM[2])
+
+    def test_firebase_identity_change_is_blocked(self):
+        self.assert_microg_upstream_change_is_blocked(sync.CUSTOM[3])
+
+    def test_required_microg_files_cannot_disappear_from_git_index(self):
+        for path in sync.CUSTOM[2:]:
+            with self.subTest(path=path):
+                self.assertIn(path, sync.custom_hashes(self.fork))
+                command(self.fork, "rm", "--", path)
+                try:
+                    with self.assertRaisesRegex(sync.SyncError, "custom MicroG support file is missing"):
+                        sync.custom_hashes(self.fork)
+                finally:
+                    command(self.fork, "restore", "--source=HEAD", "--staged", "--worktree", "--", path)
+
+    def test_clean_microg_merge_still_requires_review(self):
+        path = sync.CUSTOM[2]
+        original = (self.fork / path).read_bytes()
+        source = (self.upstream / path).read_text().replace("upstream compatibility=1", "upstream compatibility=2")
+        self.upstream_change(path, source)
+        with self.assertRaisesRegex(sync.SyncError, "modified the custom patch implementation"):
+            self.prepare()
+        self.assertEqual(command(self.fork, "status", "--porcelain"), "")
+        self.assertEqual((self.fork / path).read_bytes(), original)
+
+    def test_microg_modification_after_prepare_cannot_be_published(self):
+        self.upstream_change()
+        self.prepare()
+        path = sync.CUSTOM[3]
+        self.put(self.fork, path, "changed local Firebase identity helper\n")
+        with self.assertRaisesRegex(sync.SyncError, "Custom patch files changed after prepare"):
+            sync.finalize(self.fork, self.plan_path, self.directory / "absent.mpp",
+                          self.directory / "absent.json", "full-source")
+        self.assertFalse((self.fork / "dist").exists())
+
+    def test_unmodified_microg_files_keep_receiving_upstream_updates(self):
+        path = "patches/src/main/kotlin/hoodles/morphe/patches/all/microg/Fingerprints.kt"
+        self.upstream_change(path, "new upstream compatibility fingerprint\n")
+        self.prepare()
+        self.assertEqual((self.fork / path).read_text(), "new upstream compatibility fingerprint\n")
 
     def test_duolingo_target_change_is_blocked(self):
         source = (self.upstream / sync.COMPAT).read_text().replace("6.102.4", "6.103.0")

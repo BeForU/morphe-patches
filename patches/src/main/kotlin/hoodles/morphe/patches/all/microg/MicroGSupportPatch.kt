@@ -48,6 +48,7 @@ val microGSupportPatch = bytecodePatch(
 
     dependsOn(
         microGMetadataPatch,
+        firebaseInstallationsSupportPatch,
         addResourcesPatch,
         gmsCoreSupportResourcePatch,
         microGExtensionPatch

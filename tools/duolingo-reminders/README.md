@@ -29,6 +29,15 @@ again and install the resulting app. Updating the source alone does not modify
 an app that was already patched. The fix binds the live User before the app
 reuses its register for the Google Play Services availability result.
 
+Duolingo's FCM registration after Manager signing is fixed in **1.47.0-mod.6**.
+Keep **MicroG integration** selected, update the source, and patch an original
+6.102.4 APK again. MicroG RE already forwards the Firebase Installations auth
+token, but the app's direct FIS request used Manager's signing certificate and
+was rejected with `API_KEY_ANDROID_APP_BLOCKED`. The integration now supplies
+the original APK's verified package and certificate for those two FIS headers.
+It leaves MicroG's FCM registration path and other apps' behavior intact.
+This does not expand the learning reminder fallback to every server notification.
+
 The `BasicLoginFingerprint` error reported with **Hoodles Morphe Patches
 1.47.0** comes from that old source's Premium dependency. The archived 1.48.0
 reminder-only bundle could not update that dependency. The unified bundle
@@ -51,15 +60,16 @@ revision without waiting for an upstream change.
 Fork versions follow **`<upstream version>-mod.<revision>`**. For example,
 `1.47.0-mod.1` and `1.47.0-mod.2` share upstream 1.47.0; moving to upstream
 1.48.0 starts at `1.48.0-mod.1`. Automatic synchronization preserves this rule,
-the exact **Hoodles Morphe Patches (Modded)** display name, and the reminder
-implementation. Conflicting merges or changed Duolingo targets require manual
+the exact **Hoodles Morphe Patches (Modded)** display name, the reminder
+implementation, and the custom FIS integration. Conflicting merges, changed
+custom MicroG files, or changed Duolingo targets require manual
 review and APK validation before a new bundle can be published.
 
 CI first builds the complete merged source with `codegen :patches:buildAndroid`.
 If that build or its catalog export fails, a public upstream bundle may be
 used only when the official release tag resolves to the exact upstream main
 commit being synchronized. The public overlay then replaces all Duolingo
-classes and compatibility data with this repository's sources, adds the
+classes, MicroG integration, and compatibility data with this repository's sources, adds the
 reminder extension, and regenerates Android DEX. It cannot publish an older
 release binary while claiming to include newer main commits.
 

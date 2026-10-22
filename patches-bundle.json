@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-22T15:03:50",
-  "description": "# 1.47.0-mod.5\n\n* Automatically incorporate hoo-dles/morphe-patches main at e9c942640130c809fcb908332bf7dc56d59cf86f.\n* Preserve Restore learning reminders and the validated Duolingo targets: 6.102.4.\n* Bundle: Hoodles Morphe Patches (Modded). Build mode: full-source.",
-  "download_url": "https://raw.githubusercontent.com/BeForU/morphe-patches/main/dist/patches-1.47.0-mod.5.mpp",
+  "created_at": "2026-10-22T16:34:32",
+  "description": "# 1.47.0-mod.6\n\n* Fix Duolingo Firebase Installations registration after Manager signing by preserving the original package and certificate identity in FIS requests.\n* Continue using MicroG RE for FCM registration; other apps keep their existing MicroG behavior.\n* Preserve the Restore learning reminders startup fix and automatic upstream synchronization.\n* Validated on Duolingo 6.102.4 with Manager 2.0.0 (SUPER and MAX).",
+  "download_url": "https://raw.githubusercontent.com/BeForU/morphe-patches/main/dist/patches-1.47.0-mod.6.mpp",
   "page_url": "https://github.com/BeForU/morphe-patches",
-  "version": "1.47.0-mod.5"
+  "version": "1.47.0-mod.6"
 }

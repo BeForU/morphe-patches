@@ -1,6 +1,6 @@
 {
   "NOTE": "Generated from the actual modded bundle; do not edit patch entries manually.",
-  "version": "1.47.0-mod.5",
+  "version": "1.47.0-mod.6",
   "patches": [
     {
       "name": "AMOLED dark theme",
@@ -1847,6 +1847,7 @@
       "default": false,
       "category": null,
       "dependencies": [
+        "BytecodePatch",
         "BytecodePatch",
         "ResourcePatch",
         "ResourcePatch",

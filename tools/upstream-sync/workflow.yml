@@ -22,6 +22,7 @@ on:
       - tools/duolingo-reminders/*.kt
       - tools/duolingo-reminders/verify_distribution.py
       - patches/src/main/kotlin/hoodles/morphe/patches/duolingo/**
+      - patches/src/main/kotlin/hoodles/morphe/patches/all/microg/**
       - extensions/duolingo/**
 
 permissions:

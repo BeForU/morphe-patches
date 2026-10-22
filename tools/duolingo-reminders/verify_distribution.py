@@ -175,6 +175,7 @@ def verify(root: Path, loaded_catalog: Path | None = None) -> None:
             "patches/duolingo/shared/integrity/BasicLoginFingerprint",
             "patches/duolingo/premium/EnergyConfigCtorFingerprint",
             "patches/all/microg/MicroGSupportPatchKt",
+            "patches/all/microg/FirebaseInstallationsSupportPatchKt",
         ):
             assert f"hoodles/morphe/{relative_class}.class" in names
         for extension in ("duolingo", "all/microg", "shared"):

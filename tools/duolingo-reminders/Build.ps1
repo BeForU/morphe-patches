@@ -3,7 +3,7 @@ Build the full Manager bundle without GitHub Packages credentials.
 Requires JDK 21, Android SDK platform 36, and a Gradle 9.7.1
 distribution (for its Kotlin 2.4.0 compiler). The pinned upstream
 bundle supplies unchanged patches, shared libraries and embedded extensions.
-All local Duolingo patches and compatibility data replace their upstream
+All local Duolingo patches, MicroG integration, and compatibility data replace their upstream
 classes before DEX is regenerated, so Manager loads one consistent source.
 The normal full-project build remains .\gradlew.bat :patches:buildAndroid.
 #>
@@ -85,6 +85,7 @@ Invoke-Checked $jar @('--create', '--file', $extensionJar, '--date=2026-10-22T00
 Invoke-Checked $java @('-cp', $d8, 'com.android.tools.r8.D8', '--release', '--min-api', '26', '--lib', $androidJar, '--output', $extensionDex, $extensionJar)
 Copy-Item -LiteralPath "$extensionDex/classes.dex" -Destination "$resources/extensions/duolingo.mpe"
 $kotlinSources = @(Get-ChildItem (Join-Path $repo 'patches/src/main/kotlin/hoodles/morphe/patches/duolingo') -Recurse -Filter '*.kt' | Sort-Object FullName | Select-Object -ExpandProperty FullName)
+$kotlinSources += @(Get-ChildItem (Join-Path $repo 'patches/src/main/kotlin/hoodles/morphe/patches/all/microg') -Recurse -Filter '*.kt' | Sort-Object FullName | Select-Object -ExpandProperty FullName)
 $kotlinSources += Join-Path $repo 'patches/src/main/kotlin/hoodles/morphe/compatibility/Constants.kt'
 $overlayJar = Join-Path $work 'duolingo-overlay.jar'
 $compileClasspath = @($upstreamJar, $DesktopJar, $PatchesLibraryJar) -join [IO.Path]::PathSeparator
@@ -104,6 +105,7 @@ try {
                 if ($inputArchive -eq $upstreamJar -and (
                     $name -match '^classes[0-9]*\.dex$' -or
                     $name.StartsWith('hoodles/morphe/patches/duolingo/') -or
+                    $name.StartsWith('hoodles/morphe/patches/all/microg/') -or
                     $name.StartsWith('hoodles/morphe/compatibility/') -or
                     $name -match '^META-INF/[^/]+\.(SF|RSA|DSA)$'
                 )) { continue }

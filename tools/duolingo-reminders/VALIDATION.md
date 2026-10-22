@@ -1,5 +1,69 @@
 # Bundle validation — 2026-10-22
 
+## Unified bundle 1.49.0
+
+Artifact: `dist/patches-1.49.0.mpp` (5,929,587 bytes).
+
+SHA-256:
+`eaf872abafa595bc939193c414f0e11019afe6fdeb4af2535333a733ab630168`
+
+This release combines the upstream Hoodles Morphe Patches 1.47.0 catalog with
+the current repository's Duolingo 6.102.4 sources and reminder extension. It
+includes the corrected `BasicLoginFingerprint` used by `Enable Premium`, the
+Duolingo reminder fallback, and universal `MicroG integration` in one bundle.
+The previous reminder-only distribution could not replace the Premium patch
+selected from the old Hoodles 1.47.0 source.
+
+- Two independent builds produced identical bytes and SHA-256 values. All four
+  downloaded dependencies are pinned by version and SHA-256 in `Build.ps1`.
+- Every upstream entry outside the replaced Duolingo/compatibility classes,
+  root DEX, and manifest was preserved byte-for-byte, including all MicroG and
+  shared extensions/resources. No duplicate ZIP entries or DEX class definitions
+  remain. All JVM classes are represented in the regenerated Manager DEX.
+- The actual JVM Patcher **2.0.0** shipped in the official Morphe Manager
+  **2.0.0** APK loaded **79 public patches** from this bundle. Engine version and
+  class origin were checked. Its embedded Android framework resources were
+  supplied from the Manager APK on the classpath.
+- On the supplied original Duolingo **6.102.4** base APK, all five Duolingo
+  patches were selected together with **MicroG integration**: **Enable Premium**,
+  **Enable debug mode**, **Disable dynamic app icon**, **Unlimited RampUp time**,
+  and **Restore learning reminders**. Both **SUPER** and **MAX** runs completed
+  without patch exceptions, serialized all **35 DEX files**, and compiled the
+  modified resources. No older patch source was loaded.
+- The original base APK SHA-256 was
+  `e8229cddcdfff44f77f2fcb6cd1b1463368104d4cc0f4fd7f4a495e09ad3281a`.
+- Output audits verified the obfuscated `Lgqn.B0` login method and the login
+  constructor override, the energy constructor's trailing `Integer` parameter,
+  SUPER/MAX user flags and subscriber tier, RampUp timer overrides, and debug
+  configuration. Both runtime extensions were embedded. Startup initializes the
+  shared context before checking MicroG, then continues the original code.
+- The nine reminder bytecode checks passed with the combined selection:
+  original manager/display methods unchanged; failure and logout hooks correct;
+  notification preference checked before writes; existing alarm API and native
+  executor retained; original branch destinations preserved; helper branches
+  resolve to valid instruction boundaries.
+- Output manifests for SUPER and MAX retained the MicroG package query and
+  original-package/signature metadata and removed the dynamic icon aliases.
+- `verify_distribution.py --loaded-catalog .../bundle-metadata.json` passed:
+  all 79 loaded patches agree with the published catalog's names, descriptions,
+  defaults, dependencies, app targets, and options. Manifest, endpoint version,
+  extension DEX, and ZIP integrity checks also passed.
+
+The official [Manager 2.0.0 release](https://github.com/MorpheApp/morphe-manager/releases/tag/v2.0.0)
+APK SHA-256 was
+`22301ded7ad4cea7ad3ac2f1f9f15411cab0336ec0b67943570dec3a6bb73e21`.
+Its extracted `assets/jvm/patcher-host.jar.xz` payload, decompressed as a JAR,
+had SHA-256
+`26e15233ce44350bf632636ec15a8b1c2d99103edec76edf571f93d6ae4a499c`.
+The reusable application harness is [Validate.kt](Validate.kt).
+
+No Android device or emulator has been tested for this release. Manager's
+Android source-import UI, app startup on the device, and actual notification
+delivery remain unverified. Other apps' patches retain the upstream binaries
+and have not been reapplied to their APKs in this release.
+
+## Historical reminder-only bundle 1.48.0
+
 Artifact: `dist/duolingo-reminders-1.48.0.mpp` (65,297 bytes).
 
 SHA-256:

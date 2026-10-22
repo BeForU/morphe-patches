@@ -1,23 +1,25 @@
-# Duolingo Learning Reminders for Morphe
+# BeForU Morphe Patches
 
-## Duolingo learning reminder supplement
+## Duolingo 6.102.4 and learning reminders
 
-[Add this repository to Morphe Manager](https://morphe.software/add-source?github=BeForU/morphe-patches&name=Duolingo%20Learning%20Reminders) · [Download version 1.48.0](https://raw.githubusercontent.com/BeForU/morphe-patches/main/dist/duolingo-reminders-1.48.0.mpp)
+[Add this repository to Morphe Manager](https://morphe.software/add-source?github=BeForU/morphe-patches&name=BeForU%20Morphe%20Patches) · [Download version 1.49.0](https://raw.githubusercontent.com/BeForU/morphe-patches/main/dist/patches-1.49.0.mpp)
 
-This fork's remote source now serves **Duolingo Learning Reminders 1.48.0**, containing only `Restore learning reminders` for Duolingo **6.102.4**. It enables and reschedules local learning reminders when FCM device registration fails. The other patches in the inherited upstream catalog below require your existing source.
+This fork's remote source serves **BeForU Morphe Patches 1.49.0**. It combines the upstream **Hoodles Morphe Patches 1.47.0** catalog with the current Duolingo **6.102.4** patches, the login fingerprint fix from [upstream PR #1117](https://github.com/hoo-dles/morphe-patches/pull/1117), and `Restore learning reminders`. Duolingo patches and universal patches including `MicroG integration` can now be selected from this one source.
 
-1. Open Morphe Manager's **Sources → + → Remote** and add `https://github.com/BeForU/morphe-patches`, or use the add-source link above. If this repository is already added, tap its **Update** button. The source should show version **1.48.0** and the reminder patch.
-2. Enable **Expert mode** to select patches from multiple sources. Keep the existing patch source for `MicroG integration` and any other patches you use.
-3. Choose an original Duolingo **6.102.4** APK. In the **Duolingo Learning Reminders** source tab, select **Restore learning reminders**, then apply your chosen patches together. It is off by default, so use Expert mode and select it explicitly.
+1. Open Morphe Manager's **Sources → + → Remote** and add `https://github.com/BeForU/morphe-patches`, or use the add-source link above. If this repository is already added as **Duolingo Learning Reminders 1.48.0**, tap its **Update** button. Confirm that the downloaded bundle is version **1.49.0**.
+2. Choose an original Duolingo **6.102.4** APK. In this source, select **Enable Premium**, **MicroG integration**, and **Restore learning reminders**, plus any other Duolingo patches you want. The reminder patch is off by default; enable Expert mode if needed to show and select it.
+3. Clear Duolingo patch selections from the old **Hoodles Morphe Patches 1.47.0** source and any old local reminder source. Select each patch once from this updated source. To save this choice, long-press Duolingo's home card, open **Patch sources**, and keep only this source enabled for Duolingo. Other sources can remain installed for other apps.
 4. Open Duolingo's home screen after installation and keep learning notifications enabled in Duolingo and Android.
 
-Remote sources receive future published bundle updates through this repository's `patches-bundle.json`. An existing local `.mpp` source does not become remote automatically: add the repository once, then disable or delete the old local reminder source to avoid selecting it twice. If you use local import instead, download the new `.mpp` and select it under **Sources → + → Local**; future updates then require another file import.
+Remote sources receive future published bundle updates through this repository's `patches-bundle.json`. An existing local `.mpp` source does not become remote automatically: add the repository once, then disable or delete the old local reminder source to avoid selecting it twice. Local import under **Sources → + → Local** is also supported, but future updates then require another file import. Upstream releases are incorporated when a new bundle is published here; Manager does not merge another source into this bundle automatically.
 
-The bundle requires a Manager supporting patcher `1.14.1`. Build and publishing instructions are in [tools/duolingo-reminders](tools/duolingo-reminders/README.md). Version 1.48.0 is greater than both the old local supplement 1.0.0 and the inherited repository metadata 1.47.0. The archived [1.0.0 bundle](https://raw.githubusercontent.com/BeForU/morphe-patches/main/dist/duolingo-reminders-1.0.0.mpp) remains available for Duolingo 6.98.4.
+The bundle declares Patcher `1.14.1`; see [validation results](tools/duolingo-reminders/VALIDATION.md) for the engines and patch combinations actually checked. Build and publishing instructions are in [tools/duolingo-reminders](tools/duolingo-reminders/README.md). The archived [1.48.0 reminder-only bundle](https://raw.githubusercontent.com/BeForU/morphe-patches/main/dist/duolingo-reminders-1.48.0.mpp) targets 6.102.4, and [1.0.0](https://raw.githubusercontent.com/BeForU/morphe-patches/main/dist/duolingo-reminders-1.0.0.mpp) targets 6.98.4.
+
+If `Enable Premium` fails with `BasicLoginFingerprint` while the report lists **Hoodles Morphe Patches 1.47.0**, that patch came from the old source. The 1.48.0 reminder-only bundle did not replace its login dependency. Update this repository and select all Duolingo patches from version **1.49.0** to use the corrected dependency together with the reminder fallback.
 
 ## Upstream hoodles Morphe Patches catalog
 
-The following documentation and catalog are inherited from [hoo-dles/morphe-patches](https://github.com/hoo-dles/morphe-patches). They describe that full source, which is separate from this fork's single-patch remote distribution.
+The following documentation and catalog are inherited from [hoo-dles/morphe-patches](https://github.com/hoo-dles/morphe-patches). This fork includes the upstream 1.47.0 catalog and the Duolingo updates described above. Other apps retain their upstream compatibility requirements.
 
 ![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/hoo-dles/morphe-patches/release.yml)
 ![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)
@@ -87,7 +89,7 @@ The following documentation and catalog are inherited from [hoo-dles/morphe-patc
 | Xodo                                                 | `com.xodo.pdf.reader`                      | <ul><li>Enable Pro</li></ul>                                                                                                                                             |
 | XRecorder                                            | `videoeditor.videorecorder.screenrecorder` | <ul><li>Enable Pro</li></ul>                                                                                                                                             |
 |                                                      |                                            |                                                                                                                                                                          |
-| _Universal Patches_                                  |                                            | <ul><li>Change package name</li><li>Disable Pairip license check</li><li>Enable debug</li><li>Hide app icon</li><li>MicroG integration</li><li>Spoof signature</li></ul> |
+| _Universal Patches_                                  |                                            | <ul><li>Change package name</li><li>Disable Pairip license check</li><li>Enable debug</li><li>Hide app icon</li><li>MicroG integration</li></ul> |
 
 :lock: _Requires Root Mount installation method_\
 :dart: _This app has a strict requirement to use the version defined in the patch._\
@@ -98,7 +100,7 @@ The following documentation and catalog are inherited from [hoo-dles/morphe-patc
 ## Frequently Asked Questions :man_shrugging:
 
 #### How do I use this thing?
-For the reminder supplement, add `https://github.com/BeForU/morphe-patches` as a remote source using the instructions above. For the full upstream catalog, [add hoo-dles/morphe-patches](https://morphe.software/add-source?github=hoo-dles/morphe-patches), or manually add `https://github.com/hoo-dles/morphe-patches` as another remote source.
+Add `https://github.com/BeForU/morphe-patches` as a remote source using the instructions above. This bundle includes the upstream catalog and the updated Duolingo patches. Use the patches for Duolingo from this source together to avoid selecting an older dependency from another source.
 
 #### Help, why can't I log in with my Google account? Why doesn't Google Drive work?
 MicroG integration is needed for features that require Google Play Services. Please use the universal `MicroG integration` patch provided by this repo.

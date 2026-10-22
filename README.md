@@ -1,5 +1,18 @@
 # :leaves: hoodles Morphe Patches
 
+## Duolingo learning reminder supplement
+
+[Download the Manager patch bundle](https://github.com/BeForU/morphe-patches/raw/refs/heads/main/dist/duolingo-reminders-1.0.0.mpp)
+
+This supplemental bundle contains only `Restore learning reminders`, tested with Duolingo `6.98.4`. It enables and reschedules local learning reminders when FCM device registration fails. It does not contain the other patches listed below.
+
+1. Download the `.mpp` file, then open Morphe Manager's **Sources → + → Local** and select it.
+2. Enable **Expert mode** to select patches from multiple sources. Keep the existing patch source for `MicroG integration` and any other patches you use.
+3. Choose an original Duolingo `6.98.4` APK. In the supplemental source's patch selection tab, select **Restore learning reminders**, then apply your chosen patches together.
+4. Open Duolingo's home screen after installation and keep learning notifications enabled in Duolingo and Android.
+
+The bundle requires a Manager supporting patcher `1.14.1`. Build instructions are in [tools/duolingo-reminders](tools/duolingo-reminders/README.md).
+
 ![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/hoo-dles/morphe-patches/release.yml)
 ![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)
 
@@ -23,7 +36,7 @@
 | Cake :dart:                                          | `me.mycake`                                | <ul><li>Enable Plus</li></ul>                                                                                                                                            |
 | CamScanner                                           | `com.intsig.camscanner`                    | <ul><li>Disable telemetry</li><li>Enable Premium</li></ul>                                                                                                               |
 | DAILY POCKET                                         | `kr.co.yjteam.dailypay`                    | <ul><li>Enable Premium</li></ul>                                                                                                                                         |
-| Duolingo                                             | `com.duolingo`                             | <ul><li>Disable dynamic app icon</li><li>Enable debug mode</li><li>Enable Super/MAX</li><li>Unlimited RampUp time</li></ul>                                              |
+| Duolingo                                             | `com.duolingo`                             | <ul><li>Disable dynamic app icon</li><li>Enable debug mode</li><li>Enable Super/MAX</li><li>Restore learning reminders</li><li>Unlimited RampUp time</li></ul>                                              |
 | Eggbun                                               | `kr.eggbun.eggconvo`                       | <ul><li>Enable Premium</li><li>Force native keyboard</li></ul>                                                                                                           |
 | FotMob                                               | `com.mobilefootie.wc2010`                  | <ul><li>Enable FotMob+</li></ul>                                                                                                                                         |
 | GitHub                                               | `com.github.android`                       | <ul><li>AMOLED dark theme</li></ul>                                                                                                                                      |
@@ -83,6 +96,14 @@ Simply clicking [this deeplink](https://morphe.software/add-source?github=hoo-dl
 
 #### Help, why can't I log in with my Google account? Why doesn't Google Drive work?
 MicroG integration is needed for features that require Google Play Services. Please use the universal `MicroG integration` patch provided by this repo.
+
+#### Duolingo learning reminders do not arrive when push registration fails
+
+Select the optional `Restore learning reminders` patch and open Duolingo's home screen after installation. If FCM device registration fails, this patch enables Duolingo's local reminder fallback and replaces the alarm for the current learning language at the configured reminder time. It respects the user's learning notification setting and keeps the app's original activity and expiry checks. Existing language records do not prevent the alarm from being scheduled again.
+
+This patch does not repair FCM registration or detect messages that silently fail to arrive after successful registration. Android notification permissions, notification channels, and background restrictions still apply.
+
+The local fallback stays enabled if FCM later recovers, so both delivery paths can produce reminders. Its asynchronous state tests run with `./gradlew :extensions:duolingo:testFallbackCoordinator` and are included in that module's `check` task.
 
 #### What apk version should I use?
 Versions I have tested are defined in each patch, but they may (hopefully?) work for newer app releases. Give it a shot and open a ticket if there's issues. Patches marked with a :dart: will, almost certainly, only work with that specific version.

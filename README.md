@@ -1,17 +1,23 @@
-# :leaves: hoodles Morphe Patches
+# Duolingo Learning Reminders for Morphe
 
 ## Duolingo learning reminder supplement
 
-[Download the Manager patch bundle](https://github.com/BeForU/morphe-patches/raw/refs/heads/main/dist/duolingo-reminders-1.0.0.mpp)
+[Add this repository to Morphe Manager](https://morphe.software/add-source?github=BeForU/morphe-patches&name=Duolingo%20Learning%20Reminders) · [Download version 1.48.0](https://raw.githubusercontent.com/BeForU/morphe-patches/main/dist/duolingo-reminders-1.48.0.mpp)
 
-This supplemental bundle contains only `Restore learning reminders`, tested with Duolingo `6.98.4`. It enables and reschedules local learning reminders when FCM device registration fails. It does not contain the other patches listed below.
+This fork's remote source now serves **Duolingo Learning Reminders 1.48.0**, containing only `Restore learning reminders` for Duolingo **6.102.4**. It enables and reschedules local learning reminders when FCM device registration fails. The other patches in the inherited upstream catalog below require your existing source.
 
-1. Download the `.mpp` file, then open Morphe Manager's **Sources → + → Local** and select it.
+1. Open Morphe Manager's **Sources → + → Remote** and add `https://github.com/BeForU/morphe-patches`, or use the add-source link above. If this repository is already added, tap its **Update** button. The source should show version **1.48.0** and the reminder patch.
 2. Enable **Expert mode** to select patches from multiple sources. Keep the existing patch source for `MicroG integration` and any other patches you use.
-3. Choose an original Duolingo `6.98.4` APK. In the supplemental source's patch selection tab, select **Restore learning reminders**, then apply your chosen patches together.
+3. Choose an original Duolingo **6.102.4** APK. In the **Duolingo Learning Reminders** source tab, select **Restore learning reminders**, then apply your chosen patches together. It is off by default, so use Expert mode and select it explicitly.
 4. Open Duolingo's home screen after installation and keep learning notifications enabled in Duolingo and Android.
 
-The bundle requires a Manager supporting patcher `1.14.1`. Build instructions are in [tools/duolingo-reminders](tools/duolingo-reminders/README.md).
+Remote sources receive future published bundle updates through this repository's `patches-bundle.json`. An existing local `.mpp` source does not become remote automatically: add the repository once, then disable or delete the old local reminder source to avoid selecting it twice. If you use local import instead, download the new `.mpp` and select it under **Sources → + → Local**; future updates then require another file import.
+
+The bundle requires a Manager supporting patcher `1.14.1`. Build and publishing instructions are in [tools/duolingo-reminders](tools/duolingo-reminders/README.md). Version 1.48.0 is greater than both the old local supplement 1.0.0 and the inherited repository metadata 1.47.0. The archived [1.0.0 bundle](https://raw.githubusercontent.com/BeForU/morphe-patches/main/dist/duolingo-reminders-1.0.0.mpp) remains available for Duolingo 6.98.4.
+
+## Upstream hoodles Morphe Patches catalog
+
+The following documentation and catalog are inherited from [hoo-dles/morphe-patches](https://github.com/hoo-dles/morphe-patches). They describe that full source, which is separate from this fork's single-patch remote distribution.
 
 ![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/hoo-dles/morphe-patches/release.yml)
 ![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)
@@ -92,7 +98,7 @@ The bundle requires a Manager supporting patcher `1.14.1`. Build instructions ar
 ## Frequently Asked Questions :man_shrugging:
 
 #### How do I use this thing?
-Simply clicking [this deeplink](https://morphe.software/add-source?github=hoo-dles/morphe-patches) from a device with Morphe installed will automatically add the patches to Manager. Or, you can manually add `https://github.com/hoo-dles/morphe-patches` as a remote source in Morphe Manager.
+For the reminder supplement, add `https://github.com/BeForU/morphe-patches` as a remote source using the instructions above. For the full upstream catalog, [add hoo-dles/morphe-patches](https://morphe.software/add-source?github=hoo-dles/morphe-patches), or manually add `https://github.com/hoo-dles/morphe-patches` as another remote source.
 
 #### Help, why can't I log in with my Google account? Why doesn't Google Drive work?
 MicroG integration is needed for features that require Google Play Services. Please use the universal `MicroG integration` patch provided by this repo.

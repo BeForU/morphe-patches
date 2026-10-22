@@ -10,6 +10,7 @@ param(
     [Parameter(Mandatory)][string]$JdkHome,
     [Parameter(Mandatory)][string]$AndroidSdk,
     [Parameter(Mandatory)][string]$GradleHome,
+    [string]$BundleVersion,
     [string]$OutputPath,
     [string]$DesktopJar,
     [string]$PatchesLibraryJar,
@@ -17,7 +18,17 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
-if (-not $OutputPath) { $OutputPath = Join-Path $repo 'dist/duolingo-reminders-1.0.0.mpp' }
+if (-not $BundleVersion) {
+    $BundleVersion = (Get-Content -LiteralPath (Join-Path $repo 'patches-bundle.json') -Raw | ConvertFrom-Json).version
+}
+if ($BundleVersion -notmatch '^\d+\.\d+\.\d+([.-][A-Za-z0-9.-]+)?$') {
+    throw "Invalid bundle version: $BundleVersion"
+}
+$compatibilitySource = Get-Content -LiteralPath (Join-Path $repo 'patches/src/main/kotlin/hoodles/morphe/compatibility/Constants.kt') -Raw
+$duolingoTarget = [regex]::Match($compatibilitySource, '(?s)val DUOLINGO = Compatibility\(.*?targets = listOf\(AppTarget\("([^"\r\n]+)"\)\)')
+if (-not $duolingoTarget.Success) { throw 'Could not identify the Duolingo target version.' }
+$appVersion = $duolingoTarget.Groups[1].Value
+if (-not $OutputPath) { $OutputPath = Join-Path $repo "dist/duolingo-reminders-$BundleVersion.mpp" }
 $work = Join-Path ([IO.Path]::GetTempPath()) ('duolingo-reminders-build-' + [guid]::NewGuid())
 New-Item -ItemType Directory -Path $work | Out-Null
 function Invoke-Checked([string]$Executable, [string[]]$Arguments) {
@@ -67,8 +78,8 @@ Invoke-Checked $java @('-cp', $d8, 'com.android.tools.r8.D8', '--release', '--mi
 $manifest = Join-Path $work 'MANIFEST.MF'
 @"
 Name: Duolingo Learning Reminders
-Description: Supplemental local reminder fallback for Duolingo 6.98.4
-Version: 1.0.0
+Description: Supplemental local reminder fallback for Duolingo $appVersion
+Version: $BundleVersion
 Timestamp: 1792627200000
 Source: https://github.com/BeForU/morphe-patches
 Author: BeForU

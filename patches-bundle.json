@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-04T18:44:45",
-  "description": "# [1.47.0](https://github.com/hoo-dles/morphe-patches/compare/v1.46.0...v1.47.0) (2026-10-04)\n\n\n### Features\n\n* **Ling:** Update to `8.9.0` ([d5013e8](https://github.com/hoo-dles/morphe-patches/commit/d5013e892033f24d943ef8d4aabab3c1cb011d97))\n* **ProtonVPN:** Update patches to support `5.20.57.0` ([8f6d304](https://github.com/hoo-dles/morphe-patches/commit/8f6d3047017fdc088890d674aa287689c6690117))\n* Update `Universal MicroG` support for FotMob ([8c5f249](https://github.com/hoo-dles/morphe-patches/commit/8c5f2498c5a611b677b340bfcd49a9d60d53e98b))",
-  "download_url": "https://github.com/hoo-dles/morphe-patches/releases/download/v1.47.0/patches-1.47.0.mpp",
-  "signature_download_url": "https://github.com/hoo-dles/morphe-patches/releases/download/v1.47.0/patches-1.47.0.mpp.asc",
-  "version": "1.47.0"
+  "created_at": "2026-10-22T13:41:12",
+  "description": "# 1.48.0 (2026-10-22)\n\n### Duolingo\n\n* Update Restore learning reminders for Duolingo 6.102.4.\n* Enable and reschedule local reminders when FCM device registration fails.\n* Publish this supplemental bundle through the BeForU/morphe-patches repository source.\n\nThis source contains only Restore learning reminders. Keep your existing source for other patches and use Expert mode to select both sources.",
+  "download_url": "https://raw.githubusercontent.com/BeForU/morphe-patches/main/dist/duolingo-reminders-1.48.0.mpp",
+  "page_url": "https://github.com/BeForU/morphe-patches",
+  "version": "1.48.0"
 }

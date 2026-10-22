@@ -23,6 +23,12 @@ integration**, and **Restore learning reminders** from this source. The reminder
 patch is disabled by default; use Expert mode if needed to show it. Clear
 Duolingo selections from other sources so each patch is applied once.
 
+The startup `VerifyError` in `bej.accept(Object)` on Duolingo 6.102.4 is fixed
+in **1.47.0-mod.4**. Update this remote source, then patch the original APK
+again and install the resulting app. Updating the source alone does not modify
+an app that was already patched. The fix binds the live User before the app
+reuses its register for the Google Play Services availability result.
+
 The `BasicLoginFingerprint` error reported with **Hoodles Morphe Patches
 1.47.0** comes from that old source's Premium dependency. The archived 1.48.0
 reminder-only bundle could not update that dependency. The unified bundle

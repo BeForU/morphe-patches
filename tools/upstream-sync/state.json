@@ -1,10 +1,10 @@
 {
   "upstream_commit": "e9c942640130c809fcb908332bf7dc56d59cf86f",
   "upstream_version": "1.47.0",
-  "version": "1.47.0-mod.2",
+  "version": "1.47.0-mod.4",
   "build_mode": "release-overlay",
   "release_commit": "e9c942640130c809fcb908332bf7dc56d59cf86f",
   "release_parity": true,
-  "updated_at": "2026-10-22T14:20:49Z",
-  "bundle_sha256": "96ff3de21f17c1cb2b39fc0f1bee60675a72aa51b712009c0d1786b5b317bfc0"
+  "updated_at": "2026-10-22T14:55:45+00:00",
+  "bundle_sha256": "8237fb9862b09a30ac92536b11baed3658702e87fe28435b259b434859ba3025"
 }

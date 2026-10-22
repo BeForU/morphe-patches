@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-22T14:20:49",
-  "description": "# 1.47.0-mod.2 (2026-10-22)\n\n* Rename the Manager bundle to Hoodles Morphe Patches (Modded).\n* Keep the Duolingo 6.102.4 patches and upstream Hoodles 1.47.0 patch payloads unchanged.\n\nUpdate this repository source to receive the renamed bundle. If a custom source name is saved, use Sources > Rename to set Hoodles Morphe Patches (Modded).",
-  "download_url": "https://raw.githubusercontent.com/BeForU/morphe-patches/main/dist/patches-1.47.0-mod.2.mpp",
+  "created_at": "2026-10-22T14:55:45",
+  "description": "# 1.47.0-mod.4 (2026-10-22)\n\n* Fix the Restore learning reminders startup crash on Duolingo 6.102.4: preserve the live User before its register is reused.\n* Verify the fix with Android ART on a connected device and retain the complete Hoodles 1.47.0 catalog, Modded display name, and upstream sync configuration.\n\nUpdate this remote source, then patch an original Duolingo 6.102.4 APK again and install the resulting app.",
+  "download_url": "https://raw.githubusercontent.com/BeForU/morphe-patches/main/dist/patches-1.47.0-mod.4.mpp",
   "page_url": "https://github.com/BeForU/morphe-patches",
-  "version": "1.47.0-mod.2"
+  "version": "1.47.0-mod.4"
 }

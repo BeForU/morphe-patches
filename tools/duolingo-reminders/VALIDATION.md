@@ -1,5 +1,38 @@
 # Bundle validation — 2026-10-22
 
+## Learning reminder startup fix 1.47.0-mod.4
+
+Artifact: `dist/patches-1.47.0-mod.4.mpp` (5,930,794 bytes).
+SHA-256: `8237fb9862b09a30ac92536b11baed3658702e87fe28435b259b434859ba3025`.
+
+- The connected Samsung SM-F946N running Android 17 reported
+  `java.lang.VerifyError` in `bej.accept(Object)` at bytecode offset `0xBB`:
+  `copy-reference v5<-v5 type=Integer`. In this APK, `p1` aliases `v5`, which
+  originally held the User but had been reused for an integer availability result.
+- Binding now occurs immediately after the original local reminder manager load,
+  while the original User is still live. A new static helper in the home field's
+  declaring class loads the repository and language using its own two locals.
+  The original method retains all six registers, its instructions, and live values.
+- `VerifyReminderBytecode.kt` rejects the previous broken output and checks the
+  new hook against the original APK: User lifetime, helper field access and argument
+  order, original operands, branch/switch destinations, and exception handlers.
+- The real Manager 2.0.0 JVM patcher applied all five Duolingo patches and MicroG
+  together to the original 6.102.4 APK, for both SUPER and MAX, and serialized
+  all 35 DEX files. Original APK SHA-256:
+  `e8229cddcdfff44f77f2fcb6cd1b1463368104d4cc0f4fd7f4a495e09ad3281a`.
+- An isolated `dalvikvm -Xverify:all` probe on the connected phone reproduced
+  the exact old VerifyError. `Unsafe.allocateInstance` forced ART verification
+  without executing app constructors or methods. The corrected `bej`, `jej`,
+  and `aln` classes all passed. Test files were placed only in `/data/local/tmp`;
+  no installed app or app data was changed.
+- Eight reminder coordinator scenarios and thirteen upstream synchronization
+  regressions passed. The complete 79-patch Manager catalog and distribution
+  metadata were checked against the rebuilt bundle.
+
+This confirms the reported ART verification failure is fixed. Full app startup,
+the Manager UI, and delivery of a scheduled notification still require testing
+with the newly patched installed app.
+
 ## Automatic upstream synchronization
 
 - Thirteen regression tests cover real Git merges, protected workflow and

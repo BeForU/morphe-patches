@@ -13,6 +13,7 @@ import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.builder.MutableMethodImplementation
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.OffsetInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
@@ -77,22 +78,31 @@ val restoreLearningRemindersPatch = bytecodePatch(
         if (repositoryLoad.opcode != Opcode.IGET_OBJECT ||
             repositoryLoad.getReference<FieldReference>()?.type != ownerType
         ) throw PatchException("Learning reminders: unsupported registration call layout")
-        val repositoryRegister = repositoryLoad.registerA
-        val managerLoad = home.instructions.take(registerIndex).filter {
+        val managerLoadInstruction = home.instructions.take(registerIndex).filter {
             it.opcode == Opcode.IGET_OBJECT && it.getReference<FieldReference>()?.type == managerType
-        }.unique("home local reminder manager") as TwoRegisterInstruction
+        }.unique("home local reminder manager")
+        val managerLoadIndex = home.instructions.indexOf(managerLoadInstruction)
+        val managerLoad = managerLoadInstruction as TwoRegisterInstruction
         val managerRegister = managerLoad.registerA
-        // The home branch no longer needs the availability result or its GoogleApiAvailability object.
-        // Keep its logger intact for the original catch handler.
-        val availabilityIndex = home.instructions.take(registerIndex).indexOfLast {
-            it.getReference<MethodReference>()?.name == "isGooglePlayServicesAvailable"
+        // R8 can reuse p1 for the Context and then the integer availability result.
+        // Bind while the original User is still live, without borrowing home registers.
+        val userCastIndex = home.instructions.take(managerLoadIndex).indexOfLast {
+            it.opcode == Opcode.CHECK_CAST && it.getReference<TypeReference>()?.type == USER
         }
-        if (availabilityIndex < 0) throw PatchException("Learning reminders: availability check not found")
-        val availabilityCall = home.getInstruction<com.android.tools.smali.dexlib2.iface.instruction.formats.Instruction35c>(availabilityIndex)
-        val userRegister = home.getInstruction<OneRegisterInstruction>(availabilityIndex + 1).registerA
-        val languageRegister = availabilityCall.registerC
-        if (setOf(repositoryRegister, managerRegister, userRegister, languageRegister).size != 4 ||
-            listOf(repositoryRegister, managerRegister, userRegister, languageRegister).any { it > 15 }
+        if (userCastIndex < 0) throw PatchException("Learning reminders: home user cast not found")
+        val userRegister = home.getInstruction<OneRegisterInstruction>(userCastIndex).registerA
+        val homeRegister = managerLoad.registerB
+        val repositoryField = repositoryLoad.getReference<FieldReference>()!!
+        if (repositoryLoad.registerB != homeRegister ||
+            setOf(homeRegister, managerRegister, userRegister).size != 3 ||
+            listOf(homeRegister, managerRegister, userRegister).any { it > 15 } ||
+            home.instructions.drop(userCastIndex + 1).take(managerLoadIndex - userCastIndex).any {
+                it is OffsetInstruction || (it.opcode.setsRegister() &&
+                    (it as OneRegisterInstruction).let { instruction ->
+                        instruction.registerA == userRegister ||
+                            (it.opcode.setsWideRegister() && instruction.registerA + 1 == userRegister)
+                    })
+            }
         ) throw PatchException("Learning reminders: unsupported home registers")
 
         val settings = classDefBy(settingsType)
@@ -262,13 +272,22 @@ val restoreLearningRemindersPatch = bytecodePatch(
                 return-void
             """.trimIndent())
         }
-        // Keep this insertion straight-line. A missing language is normalized in the helper,
-        // whose labels are assembled at the start of a new method.
-        home.addInstructions(registerIndex, """
-            move-object/from16 v$userRegister, p1
-            check-cast v$userRegister, $USER
-            iget-object v$languageRegister, v$userRegister, $language
-            invoke-static {v$repositoryRegister, v$managerRegister, v$userRegister, v$languageRegister}, $EXTENSION->bind($OBJECT$OBJECT$OBJECT$OBJECT)V
+        // Load private home fields in their declaring class. The helper owns its scratch
+        // registers; the original home method keeps its register count and live values.
+        val bind = ImmutableMethod(
+            repositoryField.definingClass, "morpheBindLearningReminder",
+            listOf(repositoryField.definingClass, managerType, USER).map { ImmutableMethodParameter(it, null, null) },
+            "V", AccessFlags.PUBLIC.value or AccessFlags.STATIC.value, null, null,
+            MutableMethodImplementation(5),
+        ).toMutable().apply { addInstructions(0, """
+            iget-object v0, p0, $repositoryField
+            iget-object v1, p2, $language
+            invoke-static {v0, p1, p2, v1}, $EXTENSION->bind($OBJECT$OBJECT$OBJECT$OBJECT)V
+            return-void
+        """.trimIndent()) }
+        mutableClassDefBy(repositoryField.definingClass).methods.add(bind)
+        home.addInstructions(managerLoadIndex + 1, """
+            invoke-static {v$homeRegister, v$managerRegister, v$userRegister}, $bind
         """.trimIndent())
         failure.addInstructions(ownerIndex + 1, """
             invoke-static/range {v$ownerRegister .. v$ownerRegister}, $EXTENSION->onRegistrationFailure($OBJECT)V

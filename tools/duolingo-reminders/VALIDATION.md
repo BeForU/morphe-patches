@@ -1,5 +1,28 @@
 # Bundle validation — 2026-10-22
 
+## Automated full-source release 1.47.0-mod.5 — 2026-10-23
+
+Artifact: `dist/patches-1.47.0-mod.5.mpp` (5,687,040 bytes).
+SHA-256: `c7e5d8a41b4e99d57009f523268de0cd1958d98f7f9834306b20fba5329484bf`.
+
+- The [GitHub Actions job](https://github.com/BeForU/morphe-patches/actions/runs/39800732706)
+  completed the genuine full-source Gradle build, actual 79-patch catalog export,
+  thirteen synchronization tests, eight coordinator scenarios, final checks,
+  and automatic commit/push. No public binary fallback was needed.
+- Bot commit `cf9904960ee5a940540f531d7f99c1a263d29a8b` published the versioned
+  artifact and matching Manager metadata. The public download's hash matches
+  state.json and the checked-out artifact. Only the artifact and four release
+  metadata files changed; the latest startup fix from mod.4 was preserved.
+- Exact Manager/Patcher 2.0.0 applied all five Duolingo patches plus MicroG
+  together to the original 6.102.4 APK with SUPER, serialized 35 DEX files, and
+  rebuilt resources. The bundle loaded with the required Modded display name.
+- `VerifyReminderBytecode.kt` confirmed the early live-User binding, helper
+  argument ordering and field accesses, original register count and operands,
+  branch/switch destinations, and exception handlers. The historical unsafe
+  result failed the same audit as expected.
+- Device app startup and scheduled notification delivery were not repeated for
+  this automated build. The earlier mod.4 ART verification remains documented below.
+
 ## Learning reminder startup fix 1.47.0-mod.4
 
 Artifact: `dist/patches-1.47.0-mod.4.mpp` (5,930,794 bytes).

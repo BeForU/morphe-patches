@@ -1,6 +1,6 @@
 {
   "NOTE": "Describes the unified bundle served by patches-bundle.json. Based on Hoodles 1.47.0, with Duolingo rebuilt for 6.102.4 and Restore learning reminders added. Cross-checked against all 79 patches loaded by Patcher 2.0.0.",
-  "version": "1.49.0",
+  "version": "1.47.0-mod.1",
   "patches": [
     {
       "name": "AMOLED dark theme",

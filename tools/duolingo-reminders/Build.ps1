@@ -1,7 +1,7 @@
 <#
 Build the full Manager bundle without GitHub Packages credentials.
 Requires JDK 21, Android SDK platform 36, and a Gradle 9.7.1
-distribution (for its Kotlin 2.4.0 compiler). The pinned upstream 1.47.0
+distribution (for its Kotlin 2.4.0 compiler). The pinned upstream
 bundle supplies unchanged patches, shared libraries and embedded extensions.
 All local Duolingo patches and compatibility data replace their upstream
 classes before DEX is regenerated, so Manager loads one consistent source.
@@ -21,11 +21,13 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
+$upstream = Get-Content -LiteralPath (Join-Path $PSScriptRoot 'upstream.json') -Raw | ConvertFrom-Json
+if ($upstream.version -notmatch '^\d+\.\d+\.\d+$') { throw 'Invalid pinned upstream version.' }
 if (-not $BundleVersion) {
     $BundleVersion = (Get-Content -LiteralPath (Join-Path $repo 'patches-bundle.json') -Raw | ConvertFrom-Json).version
 }
-if ($BundleVersion -notmatch '^\d+\.\d+\.\d+([.-][A-Za-z0-9.-]+)?$') {
-    throw "Invalid bundle version: $BundleVersion"
+if ($BundleVersion -notmatch ('^' + [regex]::Escape($upstream.version) + '-mod\.[1-9]\d*$')) {
+    throw "Bundle version must be $($upstream.version)-mod.REVISION, with a positive revision."
 }
 $compatibilitySource = Get-Content -LiteralPath (Join-Path $repo 'patches/src/main/kotlin/hoodles/morphe/compatibility/Constants.kt') -Raw
 $duolingoTarget = [regex]::Match($compatibilitySource, '(?s)val DUOLINGO = Compatibility\(.*?targets = listOf\(AppTarget\("([^"\r\n]+)"\)\)')
@@ -56,7 +58,7 @@ foreach ($required in @($java, $javac, $jar, $androidJar)) {
 $DesktopJar = Get-Asset $DesktopJar 'morphe-desktop-1.17.0-all.jar' 'https://github.com/MorpheApp/morphe-desktop/releases/download/v1.17.0/morphe-desktop-1.17.0-all.jar' '8cf6a9eab4ee9dab146bddc24681897851564f53116baec11f36ba2fa2f589be'
 $PatchesLibraryJar = Get-Asset $PatchesLibraryJar 'morphe-patches-library-1.8.0-dev.1.jar' 'https://github.com/MorpheApp/morphe-patches-library/releases/download/v1.8.0-dev.1/morphe-patches-library-1.8.0-dev.1.jar' '7f17ab3893d5f0b3da932d9e5ad63ca8114a3bcf59f751195ff4f999e2fefd82'
 $d8 = Get-Asset $R8Jar 'r8-9.4.34.jar' 'https://dl.google.com/dl/android/maven2/com/android/tools/r8/9.4.34/r8-9.4.34.jar' '3a358220d5d33623543080e9b34841d1d20f708683c1504926f8cf77e9884695'
-$UpstreamBundle = Get-Asset $UpstreamBundle 'patches-1.47.0.mpp' 'https://github.com/hoo-dles/morphe-patches/releases/download/v1.47.0/patches-1.47.0.mpp' 'eac6c34b93d09cefba65c0944b681268c9a40fea1d5c25931272641ec7ff481b'
+$UpstreamBundle = Get-Asset $UpstreamBundle "patches-$($upstream.version).mpp" $upstream.download_url $upstream.sha256
 # The compiler expects a .jar suffix for classpath entries.
 $upstreamJar = Join-Path $work 'upstream.jar'
 Copy-Item -LiteralPath $UpstreamBundle -Destination $upstreamJar
@@ -135,7 +137,7 @@ Invoke-Checked $java @('-cp', $d8, 'com.android.tools.r8.D8', '--release', '--mi
 $manifest = Join-Path $work 'MANIFEST.MF'
 @"
 Name: BeForU Morphe Patches
-Description: Hoodles 1.47.0 patches with updated Duolingo $appVersion and local reminder fallback
+Description: Hoodles $($upstream.version) patches with updated Duolingo $appVersion and local reminder fallback
 Version: $BundleVersion
 Timestamp: 1792627200000
 Source: https://github.com/BeForU/morphe-patches

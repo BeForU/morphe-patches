@@ -1,6 +1,33 @@
 # Bundle validation — 2026-10-22
 
-## Unified bundle 1.49.0
+## Upstream-based version 1.47.0-mod.1
+
+Artifact: `dist/patches-1.47.0-mod.1.mpp` (5,929,591 bytes).
+
+SHA-256:
+`39f6bc4331044239e7cce24b37824e838c6aec4eb7d50f54583a8d0383693513`
+
+- Rebuilt with the same pinned dependencies and sources as 1.49.0. All 925 ZIP
+  entries have the same names, and all payloads except `META-INF/MANIFEST.MF`
+  are byte-for-byte identical. The manifest's only changed attribute is Version.
+- The upstream pin is now in `upstream.json`. Build and distribution checks
+  require `<upstream-version>-mod.<positive-revision>` and matching Gradle,
+  remote metadata, catalog, artifact filename, and manifest versions.
+- The new bundle loaded all 79 public patches in the actual Manager/Patcher
+  2.0.0 runtime. All five Duolingo patches and MicroG applied together with SUPER
+  on the original 6.102.4 APK; all 35 DEX files and resources were serialized.
+  Login, energy, premium, RampUp, debug, extension, and startup audits passed.
+  The new loaded catalog also passed `verify_distribution.py`.
+- Manager 2.0.0's remote source updater compares version strings and timestamps
+  for equality, so updating the source from 1.49.0 to 1.47.0-mod.1 is supported.
+  Use the source card's Update button during this numbering transition; the
+  patched app's update badge may not appear for the lower numerical base.
+
+This release changes the bundle version convention. The SUPER/MAX application
+and bytecode audit results for the identical patch payloads remain recorded
+below. Actual Android app startup and notification delivery remain unverified.
+
+## Historical unified bundle 1.49.0
 
 Artifact: `dist/patches-1.49.0.mpp` (5,929,587 bytes).
 

@@ -2,11 +2,13 @@
 
 ## Duolingo 6.102.4 and learning reminders
 
-[Add this repository to Morphe Manager](https://morphe.software/add-source?github=BeForU/morphe-patches&name=BeForU%20Morphe%20Patches) · [Download version 1.49.0](https://raw.githubusercontent.com/BeForU/morphe-patches/main/dist/patches-1.49.0.mpp)
+[Add this repository to Morphe Manager](https://morphe.software/add-source?github=BeForU/morphe-patches&name=BeForU%20Morphe%20Patches) · [Download version 1.47.0-mod.1](https://raw.githubusercontent.com/BeForU/morphe-patches/main/dist/patches-1.47.0-mod.1.mpp)
 
-This fork's remote source serves **BeForU Morphe Patches 1.49.0**. It combines the upstream **Hoodles Morphe Patches 1.47.0** catalog with the current Duolingo **6.102.4** patches, the login fingerprint fix from [upstream PR #1117](https://github.com/hoo-dles/morphe-patches/pull/1117), and `Restore learning reminders`. Duolingo patches and universal patches including `MicroG integration` can now be selected from this one source.
+This fork's remote source serves **BeForU Morphe Patches 1.47.0-mod.1**. It combines the upstream **Hoodles Morphe Patches 1.47.0** catalog with the current Duolingo **6.102.4** patches, the login fingerprint fix from [upstream PR #1117](https://github.com/hoo-dles/morphe-patches/pull/1117), and `Restore learning reminders`. Duolingo patches and universal patches including `MicroG integration` can now be selected from this one source.
 
-1. Open Morphe Manager's **Sources → + → Remote** and add `https://github.com/BeForU/morphe-patches`, or use the add-source link above. If this repository is already added as **Duolingo Learning Reminders 1.48.0**, tap its **Update** button. Confirm that the downloaded bundle is version **1.49.0**.
+Fork versions use **`<upstream version>-mod.<revision>`**: `1.47.0-mod.1` is the first revision based on upstream `1.47.0`. Further custom fixes use `1.47.0-mod.2`, and incorporating upstream `1.48.0` starts at `1.48.0-mod.1`. The previously published `1.49.0` bundle remains available as an archive; the new version identifies its actual upstream baseline.
+
+1. Open Morphe Manager's **Sources → + → Remote** and add `https://github.com/BeForU/morphe-patches`, or use the add-source link above. If this repository is already added as **Duolingo Learning Reminders 1.48.0** or **BeForU Morphe Patches 1.49.0**, tap its **Update** button. Confirm that the downloaded bundle is version **1.47.0-mod.1**.
 2. Choose an original Duolingo **6.102.4** APK. In this source, select **Enable Premium**, **MicroG integration**, and **Restore learning reminders**, plus any other Duolingo patches you want. The reminder patch is off by default; enable Expert mode if needed to show and select it.
 3. Clear Duolingo patch selections from the old **Hoodles Morphe Patches 1.47.0** source and any old local reminder source. Select each patch once from this updated source. To save this choice, long-press Duolingo's home card, open **Patch sources**, and keep only this source enabled for Duolingo. Other sources can remain installed for other apps.
 4. Open Duolingo's home screen after installation and keep learning notifications enabled in Duolingo and Android.
@@ -15,7 +17,7 @@ Remote sources receive future published bundle updates through this repository's
 
 The bundle declares Patcher `1.14.1`; see [validation results](tools/duolingo-reminders/VALIDATION.md) for the engines and patch combinations actually checked. Build and publishing instructions are in [tools/duolingo-reminders](tools/duolingo-reminders/README.md). The archived [1.48.0 reminder-only bundle](https://raw.githubusercontent.com/BeForU/morphe-patches/main/dist/duolingo-reminders-1.48.0.mpp) targets 6.102.4, and [1.0.0](https://raw.githubusercontent.com/BeForU/morphe-patches/main/dist/duolingo-reminders-1.0.0.mpp) targets 6.98.4.
 
-If `Enable Premium` fails with `BasicLoginFingerprint` while the report lists **Hoodles Morphe Patches 1.47.0**, that patch came from the old source. The 1.48.0 reminder-only bundle did not replace its login dependency. Update this repository and select all Duolingo patches from version **1.49.0** to use the corrected dependency together with the reminder fallback.
+If `Enable Premium` fails with `BasicLoginFingerprint` while the report lists **Hoodles Morphe Patches 1.47.0**, that patch came from the old source. The 1.48.0 reminder-only bundle did not replace its login dependency. Update this repository and select all Duolingo patches from version **1.47.0-mod.1** to use the corrected dependency together with the reminder fallback.
 
 ## Upstream hoodles Morphe Patches catalog
 

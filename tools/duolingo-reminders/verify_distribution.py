@@ -54,8 +54,17 @@ def dex_classes(data: bytes) -> set[str]:
 def verify(root: Path, loaded_catalog: Path | None = None) -> None:
     metadata = json.loads((root / "patches-bundle.json").read_text(encoding="utf-8-sig"))
     catalog = json.loads((root / "patches-list.json").read_text(encoding="utf-8-sig"))
+    upstream = json.loads((root / "tools/duolingo-reminders/upstream.json").read_text(encoding="utf-8"))
     version = metadata["version"]
-    assert re.fullmatch(r"\d+\.\d+\.\d+", version), "Expected a stable bundle version"
+    assert re.fullmatch(r"\d+\.\d+\.\d+", upstream["version"]), "Invalid upstream version"
+    assert re.fullmatch(re.escape(upstream["version"]) + r"-mod\.[1-9]\d*", version), (
+        "Expected <upstream-version>-mod.<positive-revision>"
+    )
+    assert upstream["download_url"] == (
+        f"https://github.com/hoo-dles/morphe-patches/releases/download/"
+        f"v{upstream['version']}/patches-{upstream['version']}.mpp"
+    ), "Pinned bundle must match the upstream version"
+    assert re.fullmatch(r"[0-9a-f]{64}", upstream["sha256"]), "Missing upstream bundle hash"
     gradle_version = re.search(r"(?m)^version\s*=\s*(\S+)", (root / "gradle.properties").read_text()).group(1)
     assert gradle_version == version, "Gradle and published bundle versions differ"
     datetime.fromisoformat(metadata["created_at"])

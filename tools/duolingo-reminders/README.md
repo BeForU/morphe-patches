@@ -1,6 +1,6 @@
 # Unified Morphe bundle with Duolingo updates
 
-`dist/patches-1.49.0.mpp` is **BeForU Morphe Patches 1.49.0**. It includes the
+`dist/patches-1.47.0-mod.1.mpp` is **BeForU Morphe Patches 1.47.0-mod.1**. It includes the
 upstream **Hoodles Morphe Patches 1.47.0** catalog, rebuilt Duolingo sources
 targeting **6.102.4** (`com.duolingo`), the login fix from
 [PR #1117](https://github.com/hoo-dles/morphe-patches/pull/1117), and the optional
@@ -10,7 +10,8 @@ including **MicroG integration**, are available from one source.
 Add `https://github.com/BeForU/morphe-patches` under Morphe Manager's
 **Sources → + → Remote**, or [use the add-source link](https://morphe.software/add-source?github=BeForU/morphe-patches&name=BeForU%20Morphe%20Patches).
 An existing remote source for this fork can use **Update** to fetch version
-1.49.0, including a source previously named **Duolingo Learning Reminders**.
+1.47.0-mod.1, including a source previously named **Duolingo Learning Reminders**
+or previously publishing version **1.49.0**.
 Choose an original Duolingo 6.102.4 APK and select **Enable Premium**, **MicroG
 integration**, and **Restore learning reminders** from this updated source.
 The reminder patch is disabled by default; use Expert mode if needed to show it.
@@ -26,6 +27,24 @@ An existing local source must be replaced by adding the repository once;
 disable or delete the old local reminder source afterwards. Local `.mpp` import
 also works, but it does not receive remote updates. Archived reminder-only
 artifacts remain available: 1.48.0 targets 6.102.4 and 1.0.0 targets 6.98.4.
+The previously published unified 1.49.0 bundle is also retained as an archive.
+
+Fork versions follow **`<upstream version>-mod.<revision>`**. The current
+`1.47.0-mod.1` identifies upstream 1.47.0 with the first custom revision;
+subsequent custom fixes use `1.47.0-mod.2`. Incorporating upstream 1.48.0 starts
+at `1.48.0-mod.1`.
+
+The pinned baseline version, download URL, and SHA-256 are stored in
+[`upstream.json`](upstream.json). The build and distribution verifier require
+the bundle version to match that baseline followed by `-mod.` and a positive
+revision number.
+
+When migrating from the former 1.49.0 numbering, use the source card's
+**Update** button. Manager 2.0.0 accepts the changed source version even though
+the numerical base is lower; the patched app's update badge may not appear.
+Its changelog history classifies hyphenated versions as prereleases, but
+loading a mod bundle from the stable source does not require the prerelease
+toggle. See the [source update implementation](https://github.com/MorpheApp/morphe-manager/blob/v2.0.0/app/src/main/java/app/morphe/manager/domain/bundles/RemotePatchBundle.kt).
 
 The bundle contains JVM classes for desktop use, root `classes.dex` for Manager,
 embedded runtime extensions, and a standard Morphe manifest declaring Patcher
@@ -79,7 +98,7 @@ classpath: the APK supplies Android framework resources needed by the engine.
 ```powershell
 # Replace the variables with paths to your downloaded files and compiled validator.
 & "$JdkHome/bin/java.exe" -Xmx8g -cp "$hostJar;$managerApk;$validatorJar" ValidateKt `
-    $bundle $originalBaseApk $temporaryWork $validationOutput SUPER 1.49.0 6.102.4
+    $bundle $originalBaseApk $temporaryWork $validationOutput SUPER 1.47.0-mod.1 6.102.4
 python tools/duolingo-reminders/verify_distribution.py `
     --loaded-catalog "$validationOutput/bundle-metadata.json"
 ```
@@ -93,8 +112,12 @@ Android device separately.
 
 1. Update and validate the Duolingo sources against the target APK, then update
    `Compat.DUOLINGO`. When incorporating a newer upstream release, update the
-   pinned baseline and verify the combined bundle again.
-2. Bump `patches-bundle.json`'s `version` above the last published version. Update
+   version, URL, and SHA-256 in `upstream.json` and verify the combined bundle
+   again.
+2. Set `patches-bundle.json`'s `version` to `<upstream version>-mod.<revision>`.
+   Increase the custom revision for fixes on the same upstream baseline, for
+   example `1.47.0-mod.1` → `1.47.0-mod.2`. When updating the upstream baseline,
+   reset the custom revision, for example `1.48.0-mod.1`. Update
    `created_at` (ISO-8601 UTC), `description`, and `download_url` to the matching
    versioned `dist/patches-VERSION.mpp` on this fork's `main` branch. Keep
    `gradle.properties`'s version and `patches-list.json` in sync with the bundle.

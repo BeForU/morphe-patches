@@ -17,12 +17,16 @@ param(
     [string]$DesktopJar,
     [string]$PatchesLibraryJar,
     [string]$R8Jar,
-    [string]$UpstreamBundle
+    [string]$UpstreamBundle,
+    [string]$CatalogPath
 )
 $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $upstream = Get-Content -LiteralPath (Join-Path $PSScriptRoot 'upstream.json') -Raw | ConvertFrom-Json
 if ($upstream.version -notmatch '^\d+\.\d+\.\d+$') { throw 'Invalid pinned upstream version.' }
+if (-not $upstream.download_url -or -not $upstream.sha256) {
+    throw 'This upstream main commit has no matching public release bundle. Use the full source Gradle build.'
+}
 if (-not $BundleVersion) {
     $BundleVersion = (Get-Content -LiteralPath (Join-Path $repo 'patches-bundle.json') -Raw | ConvertFrom-Json).version
 }
@@ -30,9 +34,10 @@ if ($BundleVersion -notmatch ('^' + [regex]::Escape($upstream.version) + '-mod\.
     throw "Bundle version must be $($upstream.version)-mod.REVISION, with a positive revision."
 }
 $compatibilitySource = Get-Content -LiteralPath (Join-Path $repo 'patches/src/main/kotlin/hoodles/morphe/compatibility/Constants.kt') -Raw
-$duolingoTarget = [regex]::Match($compatibilitySource, '(?s)val DUOLINGO = Compatibility\(.*?targets = listOf\(AppTarget\("([^"\r\n]+)"\)\)')
-if (-not $duolingoTarget.Success) { throw 'Could not identify the Duolingo target version.' }
-$appVersion = $duolingoTarget.Groups[1].Value
+$duolingoCompatibility = [regex]::Match($compatibilitySource, '(?sm)^\s*val\s+DUOLINGO\s*=\s*Compatibility\((.*?)(?=^\s*val\s+\w+\s*=|\z)')
+$duolingoTargets = [regex]::Matches($duolingoCompatibility.Groups[1].Value, '\bAppTarget\(\s*(?:version\s*=\s*)?"([^"\r\n]+)"')
+if (-not $duolingoCompatibility.Success -or $duolingoTargets.Count -eq 0) { throw 'Could not identify the Duolingo target versions.' }
+$appVersion = ($duolingoTargets | ForEach-Object { $_.Groups[1].Value }) -join ', '
 if (-not $OutputPath) { $OutputPath = Join-Path $repo "dist/patches-$BundleVersion.mpp" }
 $work = Join-Path ([IO.Path]::GetTempPath()) ('duolingo-patches-build-' + [guid]::NewGuid())
 New-Item -ItemType Directory -Path $work | Out-Null
@@ -48,9 +53,10 @@ function Get-Asset([string]$Existing, [string]$Name, [string]$Url, [string]$Sha2
     }
     return $target
 }
-$java = Join-Path $JdkHome 'bin/java.exe'
-$javac = Join-Path $JdkHome 'bin/javac.exe'
-$jar = Join-Path $JdkHome 'bin/jar.exe'
+$executableSuffix = if ([Environment]::OSVersion.Platform -eq [PlatformID]::Win32NT) { '.exe' } else { '' }
+$java = Join-Path $JdkHome "bin/java$executableSuffix"
+$javac = Join-Path $JdkHome "bin/javac$executableSuffix"
+$jar = Join-Path $JdkHome "bin/jar$executableSuffix"
 $androidJar = Join-Path $AndroidSdk 'platforms/android-36/android.jar'
 foreach ($required in @($java, $javac, $jar, $androidJar)) {
     if (-not (Test-Path -LiteralPath $required)) { throw "Missing prerequisite: $required" }
@@ -159,6 +165,11 @@ $finalJar = Join-Path $work 'bundle.mpp'
 Invoke-Checked $jar @('--create', '--file', $finalJar, '--manifest', "$normalized/META-INF/MANIFEST.MF", '--date=2026-10-22T00:00:00Z', '-C', $normalized, '.')
 New-Item -ItemType Directory -Path ([IO.Path]::GetDirectoryName([IO.Path]::GetFullPath($OutputPath))) -Force | Out-Null
 Copy-Item -LiteralPath $finalJar -Destination $OutputPath
+if ($CatalogPath) {
+    # Describe the classes actually loaded from this bundle. Reusing a previous
+    # release's catalog would silently omit newly added upstream patches.
+    & (Join-Path $PSScriptRoot 'Export-Catalog.ps1') -JdkHome $JdkHome -GradleHome $GradleHome -BundlePath $OutputPath -OutputPath $CatalogPath -ExpectedVersion $BundleVersion -DesktopJar $DesktopJar
+}
 Get-FileHash -LiteralPath $OutputPath -Algorithm SHA256
 Write-Output "Bundle: $OutputPath"
 Write-Output "Build intermediates: $work"

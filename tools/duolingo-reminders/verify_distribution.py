@@ -60,11 +60,19 @@ def verify(root: Path, loaded_catalog: Path | None = None) -> None:
     assert re.fullmatch(re.escape(upstream["version"]) + r"-mod\.[1-9]\d*", version), (
         "Expected <upstream-version>-mod.<positive-revision>"
     )
-    assert upstream["download_url"] == (
-        f"https://github.com/hoo-dles/morphe-patches/releases/download/"
-        f"v{upstream['version']}/patches-{upstream['version']}.mpp"
-    ), "Pinned bundle must match the upstream version"
-    assert re.fullmatch(r"[0-9a-f]{64}", upstream["sha256"]), "Missing upstream bundle hash"
+    if upstream.get("download_url") is None or upstream.get("sha256") is None:
+        state = json.loads((root / "tools/upstream-sync/state.json").read_text())
+        assert state["build_mode"] == "full-source" and not state["release_parity"], (
+            "Unreleased upstream commits require a full source build"
+        )
+        assert upstream["source_commit"] == state["upstream_commit"], "Unreleased source pin differs"
+        assert upstream.get("download_url") is None and upstream.get("sha256") is None
+    else:
+        assert upstream["download_url"] == (
+            f"https://github.com/hoo-dles/morphe-patches/releases/download/"
+            f"v{upstream['version']}/patches-{upstream['version']}.mpp"
+        ), "Pinned bundle must match the upstream version"
+        assert re.fullmatch(r"[0-9a-f]{64}", upstream["sha256"]), "Missing upstream bundle hash"
     gradle_version = re.search(r"(?m)^version\s*=\s*(\S+)", (root / "gradle.properties").read_text()).group(1)
     assert gradle_version == version, "Gradle and published bundle versions differ"
     datetime.fromisoformat(metadata["created_at"])
@@ -76,18 +84,30 @@ def verify(root: Path, loaded_catalog: Path | None = None) -> None:
     assert metadata["description"], "Manager changelog must describe this update"
     assert catalog["version"] == version, "Catalog and remote metadata versions differ"
     patches = catalog["patches"]
-    assert len(patches) == 79, "Expected all 78 upstream patches plus the reminder patch"
+    assert patches, "The distributed catalog must not be empty"
     duolingo = {
         patch["name"]: patch for patch in patches
         if any(package["packageName"] == "com.duolingo"
                for package in patch["compatiblePackages"] or [])
     }
-    assert set(duolingo) == DUOLINGO_PATCHES, "Missing or unexpected Duolingo patches"
+    assert DUOLINGO_PATCHES <= set(duolingo), "Missing required Duolingo patches"
     assert duolingo["Restore learning reminders"]["default"] is False
     universal = {patch["name"] for patch in patches if patch["compatiblePackages"] is None}
-    assert universal == UNIVERSAL_PATCHES, "Universal patches must be in the same source"
+    assert UNIVERSAL_PATCHES <= universal, "Required universal patches must be in the same source"
     if loaded_catalog:
         loaded = json.loads(loaded_catalog.read_text(encoding="utf-8-sig"))
+        if isinstance(loaded, dict):
+            assert loaded["version"] == version, "Loaded catalog and endpoint versions differ"
+            # Catalog.kt exports the complete schema rather than a reduced test snapshot.
+            assert sorted(loaded["patches"], key=lambda p: (p["name"], str(p["compatiblePackages"]))) == sorted(
+                patches, key=lambda p: (p["name"], str(p["compatiblePackages"]))
+            ), "Published catalog differs from the finished bundle"
+            loaded = [
+                dict(p, compatibility=None if p["compatiblePackages"] is None else [
+                    dict(c, targets=[t["version"] for t in c["targets"]])
+                    for c in p["compatiblePackages"]
+                ]) for p in loaded["patches"]
+            ]
 
         def identity(patch: dict) -> tuple:
             packages = patch.get("compatibility", patch.get("compatiblePackages"))
@@ -120,7 +140,7 @@ def verify(root: Path, loaded_catalog: Path | None = None) -> None:
     app_version = re.search(
         r'val DUOLINGO = Compatibility\(.*?AppTarget\("([^"\r\n]+)"\)', source, re.S
     ).group(1)
-    for patch in duolingo.values():
+    for patch in (duolingo[name] for name in DUOLINGO_PATCHES):
         package = next(p for p in patch["compatiblePackages"] if p["packageName"] == "com.duolingo")
         assert [target["version"] for target in package["targets"]] == [app_version]
     bundle = root / relative
@@ -136,7 +156,11 @@ def verify(root: Path, loaded_catalog: Path | None = None) -> None:
         assert attributes["Name"] == "Hoodles Morphe Patches (Modded)"
         assert app_version in attributes["Description"]
         assert attributes["Source"] == "https://github.com/BeForU/morphe-patches"
-        assert attributes["Patcher-Version"] == "1.14.1"
+        patcher_version = re.search(
+            r'(?m)^morphe-patcher\s*=\s*"([^"]+)"',
+            (root / "gradle/libs.versions.toml").read_text(),
+        ).group(1)
+        assert attributes["Patcher-Version"] == patcher_version, "Bundle API differs from the source dependency"
         dex_names = [name for name in names if re.fullmatch(r"classes(?:\d+)?\.dex", name)]
         assert "classes.dex" in dex_names
         android_classes: set[str] = set()

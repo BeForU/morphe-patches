@@ -131,5 +131,9 @@ node_modules/
 .idea/
 local.properties
 
+# Python helpers used by upstream synchronization
+__pycache__/
+*.pyc
+
 # Morphe
 extensions/__generated__/

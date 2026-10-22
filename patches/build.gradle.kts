@@ -4,7 +4,7 @@ patches {
     about {
         name = "Hoodles Morphe Patches (Modded)"
         description = "Various patches for use with Morphe"
-        source = "git@github.com:hoo-dles/morphe-patches.git"
+        source = "https://github.com/BeForU/morphe-patches"
         author = "hoodles"
         contact = "na"
         website = "https://morphe.software"

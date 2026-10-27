@@ -1,6 +1,6 @@
 {
   "NOTE": "Generated from the actual modded bundle; do not edit patch entries manually.",
-  "version": "1.47.0-mod.7",
+  "version": "1.47.0-mod.8",
   "patches": [
     {
       "name": "AMOLED dark theme",
@@ -1839,6 +1839,38 @@
       "category": null,
       "dependencies": [],
       "compatiblePackages": null,
+      "options": []
+    },
+    {
+      "name": "Hide swipe up guide",
+      "description": "Hides the viewer's swipe-up onboarding guide and automatic peek/bounce movement, while preserving manual swiping between posts and Reels.",
+      "default": false,
+      "category": null,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "com.instagram.android",
+          "name": "Instagram",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": null,
+          "signatures": null,
+          "targets": [
+            {
+              "version": "452.1.0.53.64",
+              "versionCodes": {
+                "ARM64_V8A": 385811006,
+                "ARMEABI_V7A": 385811006,
+                "X86_64": 385811006,
+                "X86": 385811006
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
       "options": []
     },
     {

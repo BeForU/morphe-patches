@@ -92,6 +92,12 @@ def verify(root: Path, loaded_catalog: Path | None = None) -> None:
     }
     assert DUOLINGO_PATCHES <= set(duolingo), "Missing required Duolingo patches"
     assert duolingo["Restore learning reminders"]["default"] is False
+    guide_source = root / "patches/src/main/kotlin/hoodles/morphe/patches/instagram/scrollnux/HideSwipeUpGuidePatch.kt"
+    if guide_source.is_file():
+        guides = [patch for patch in patches if patch["name"] == "Hide swipe up guide"]
+        assert len(guides) == 1 and guides[0]["default"] is False, "Missing opt-in Instagram swipe guide patch"
+        assert any(package["packageName"] == "com.instagram.android"
+                   for package in guides[0]["compatiblePackages"]), "Incorrect Instagram package"
     universal = {patch["name"] for patch in patches if patch["compatiblePackages"] is None}
     assert UNIVERSAL_PATCHES <= universal, "Required universal patches must be in the same source"
     if loaded_catalog:

@@ -1,5 +1,21 @@
 # Hoodles Morphe Patches (Modded)
 
+## Instagram swipe-up guide (with Piko)
+
+This remote source includes the opt-in **Hide swipe up guide** patch for
+Instagram **452.1.0.53.64**. Update this source in Morphe Manager, then select
+this patch alongside the Instagram patches you want from Piko. Leave
+**Disable Reels scrolling** off to preserve manual swiping. The guide patch
+does not change touch handling or normal scrolling.
+
+Use a Piko **pre-release** supporting **452.1.0.53.64**; Piko's stable source
+currently targets an older version. Joint application with Piko **3.11.0-dev.3**
+(`Add settings`, `Disable ads`, `Disable video autoplay`) passed patch execution,
+resource compilation and DEX generation on the supplied APK. Other Piko patch
+combinations and device behavior remain untested. The guide patch also passed
+standalone application and DEX checks.
+See [implementation and validation](tools/instagram-guide/README.md).
+
 ## Duolingo 6.102.4 and learning reminders
 
 [Add this repository to Morphe Manager](https://morphe.software/add-source?github=BeForU/morphe-patches&name=Hoodles%20Morphe%20Patches%20%28Modded%29) · [Current version and download URL](patches-bundle.json) · [Current patch catalog](patches-list.json)

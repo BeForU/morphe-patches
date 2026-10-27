@@ -9,6 +9,7 @@ for the result of an actual scheduled or manual run.
 Successful updates retain:
 
 - The **Restore learning reminders** patch and its Duolingo runtime extension.
+- The opt-in Instagram **Hide swipe up guide** patch and its validation tools.
 - The exact bundle name **Hoodles Morphe Patches (Modded)**.
 - The version format **`<upstream version>-mod.<revision>`**. A changed commit or
   manual rebuild on the same baseline increments the custom revision; a new

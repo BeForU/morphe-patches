@@ -61,6 +61,7 @@ class MergeFixture(unittest.TestCase):
         self.put(self.fork, sync.CUSTOM[1] + "RestoreLearningRemindersPatch.kt", "custom patch\n")
         self.put(self.fork, sync.CUSTOM[2], "upstream compatibility=1\n" + "shared code\n" * 10 + "custom FIS dependency\n")
         self.put(self.fork, sync.CUSTOM[3], "custom FIS original identity helpers\n")
+        self.put(self.fork, sync.CUSTOM[4], "custom Instagram swipe guide patch\n")
         self.commit(self.fork, "fork customization")
         self.head = command(self.fork, "rev-parse", "HEAD")
         self.plan_path = self.directory / "plan.json"
@@ -162,7 +163,7 @@ class MergeFixture(unittest.TestCase):
                 self.assertIn(path, sync.custom_hashes(self.fork))
                 command(self.fork, "rm", "--", path)
                 try:
-                    with self.assertRaisesRegex(sync.SyncError, "custom MicroG support file is missing"):
+                    with self.assertRaisesRegex(sync.SyncError, "custom patch/support file is missing"):
                         sync.custom_hashes(self.fork)
                 finally:
                     command(self.fork, "restore", "--source=HEAD", "--staged", "--worktree", "--", path)
@@ -260,8 +261,23 @@ class MergeFixture(unittest.TestCase):
             archive.writestr("classes.dex", b"dex\n035\0payload")
             archive.writestr("extensions/duolingo.mpe", b"dex\n035\0extension")
         catalog = self.directory / "loaded-catalog.json"
-        catalog.write_text(json.dumps({"version": version, "patches": [{"name": "Restore learning reminders", "default": False}]}))
+        catalog.write_text(json.dumps({"version": version, "patches": [
+            {"name": "Restore learning reminders", "default": False},
+            {"name": "Hide swipe up guide", "default": False},
+        ]}))
         return bundle, catalog
+
+    def test_missing_instagram_patch_cannot_replace_endpoint(self):
+        plan = self.prepare(rebuild=True)
+        bundle, catalog = self.built_fixture(plan["version"])
+        value = json.loads(catalog.read_text())
+        value["patches"] = [p for p in value["patches"] if p["name"] != "Hide swipe up guide"]
+        catalog.write_text(json.dumps(value))
+        before = (self.fork / "patches-bundle.json").read_bytes()
+        with self.assertRaisesRegex(sync.SyncError, "Hide swipe up guide"):
+            sync.finalize(self.fork, self.plan_path, bundle, catalog, "full-source")
+        self.assertEqual((self.fork / "patches-bundle.json").read_bytes(), before)
+        self.assertFalse((self.fork / "dist").exists())
 
     def test_successful_full_source_finalization_records_exact_provenance(self):
         # A lightweight stand-in isolates publication orchestration. The real

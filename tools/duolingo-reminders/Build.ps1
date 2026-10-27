@@ -86,6 +86,7 @@ Invoke-Checked $java @('-cp', $d8, 'com.android.tools.r8.D8', '--release', '--mi
 Copy-Item -LiteralPath "$extensionDex/classes.dex" -Destination "$resources/extensions/duolingo.mpe"
 $kotlinSources = @(Get-ChildItem (Join-Path $repo 'patches/src/main/kotlin/hoodles/morphe/patches/duolingo') -Recurse -Filter '*.kt' | Sort-Object FullName | Select-Object -ExpandProperty FullName)
 $kotlinSources += @(Get-ChildItem (Join-Path $repo 'patches/src/main/kotlin/hoodles/morphe/patches/all/microg') -Recurse -Filter '*.kt' | Sort-Object FullName | Select-Object -ExpandProperty FullName)
+$kotlinSources += @(Get-ChildItem (Join-Path $repo 'patches/src/main/kotlin/hoodles/morphe/patches/instagram/scrollnux') -Filter '*.kt' | Sort-Object FullName | Select-Object -ExpandProperty FullName)
 $kotlinSources += Join-Path $repo 'patches/src/main/kotlin/hoodles/morphe/compatibility/Constants.kt'
 $overlayJar = Join-Path $work 'duolingo-overlay.jar'
 $compileClasspath = @($upstreamJar, $DesktopJar, $PatchesLibraryJar) -join [IO.Path]::PathSeparator

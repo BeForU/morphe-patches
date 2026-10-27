@@ -30,13 +30,14 @@ PIN = "tools/duolingo-reminders/upstream.json"
 COMPAT = "patches/src/main/kotlin/hoodles/morphe/compatibility/Constants.kt"
 PROTECTED = (
     ".github/workflows/", ".releaserc", "README.md", "patches-bundle.json",
-    "patches-list.json", "tools/duolingo-reminders/", "tools/upstream-sync/", "dist/",
+    "patches-list.json", "tools/duolingo-reminders/", "tools/instagram-guide/", "tools/upstream-sync/", "dist/",
 )
 CUSTOM = (
     "extensions/duolingo/",
     "patches/src/main/kotlin/hoodles/morphe/patches/duolingo/misc/notifications/",
     "patches/src/main/kotlin/hoodles/morphe/patches/all/microg/MicroGSupportPatch.kt",
     "patches/src/main/kotlin/hoodles/morphe/patches/all/microg/FirebaseInstallationsSupportPatch.kt",
+    "patches/src/main/kotlin/hoodles/morphe/patches/instagram/scrollnux/HideSwipeUpGuidePatch.kt",
 )
 
 
@@ -106,7 +107,7 @@ def custom_hashes(root: Path) -> dict[str, str]:
         raise SyncError("The custom reminder runtime extension is missing.")
     for required in (path for path in CUSTOM if not path.endswith("/")):
         if required not in result:
-            raise SyncError(f"Required custom MicroG support file is missing: {required}")
+            raise SyncError(f"Required custom patch/support file is missing: {required}")
     return result
 
 
@@ -381,6 +382,10 @@ def finalize(root: Path, plan_path: Path, bundle: Path, catalog: Path, build_mod
     reminder = [patch for patch in exported["patches"] if patch["name"] == "Restore learning reminders"]
     if len(reminder) != 1:
         raise SyncError("The loaded bundle must contain exactly one Restore learning reminders patch.")
+    if (root / CUSTOM[4]).is_file():
+        guides = [patch for patch in exported["patches"] if patch["name"] == "Hide swipe up guide"]
+        if len(guides) != 1 or guides[0]["default"] is not False:
+            raise SyncError("The loaded bundle must contain one opt-in Hide swipe up guide patch.")
     version = plan["version"]
     relative = f"dist/patches-{version}.mpp"
     artifact = root / relative
@@ -397,6 +402,7 @@ def finalize(root: Path, plan_path: Path, bundle: Path, catalog: Path, build_mod
         "description": f"# {version}\n\n* Automatically incorporate hoo-dles/morphe-patches main "
                        f"at {plan['upstream_sha']}.\n* Preserve Restore learning reminders and the validated "
                        f"Duolingo targets: {', '.join(plan['duolingo_targets'])}.\n"
+                       f"* Include the opt-in Instagram Hide swipe up guide patch.\n"
                        f"* Bundle: {BUNDLE_NAME}. Build mode: {build_mode}.",
         "download_url": f"https://raw.githubusercontent.com/BeForU/morphe-patches/main/{relative}",
         "page_url": FORK_URL, "version": version,

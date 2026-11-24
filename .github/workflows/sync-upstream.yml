@@ -1,8 +1,6 @@
 name: Sync upstream and publish modded patches
 
 on:
-  schedule:
-    - cron: '17 * * * *'
   workflow_dispatch:
     inputs:
       rebuild:
@@ -10,20 +8,6 @@ on:
         required: false
         default: false
         type: boolean
-  push:
-    branches:
-      - main
-    paths:
-      - .github/workflows/sync-upstream.yml
-      - tools/upstream-sync/*.py
-      - tools/upstream-sync/*.ps1
-      - tools/upstream-sync/workflow.yml
-      - tools/duolingo-reminders/*.ps1
-      - tools/duolingo-reminders/*.kt
-      - tools/duolingo-reminders/verify_distribution.py
-      - patches/src/main/kotlin/hoodles/morphe/patches/duolingo/**
-      - patches/src/main/kotlin/hoodles/morphe/patches/all/microg/**
-      - extensions/duolingo/**
 
 permissions:
   contents: write

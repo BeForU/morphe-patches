@@ -20,3 +20,10 @@ object BasicLoginFingerprint : Fingerprint(
     parameters = listOf("Ljava/lang/String;", "Ljava/lang/String;"),
     returnType = "Lcom/duolingo/data/signuplogin/LoginRequest\$EmailLoginRequest;"
 )
+
+// Newer builds delegate the construction to a static three-string factory.
+object BasicLoginFactoryFingerprint : Fingerprint(
+    accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.STATIC),
+    parameters = listOf("Ljava/lang/String;", "Ljava/lang/String;", "Ljava/lang/String;"),
+    returnType = "Lcom/duolingo/data/signuplogin/LoginRequest\$EmailLoginRequest;"
+)

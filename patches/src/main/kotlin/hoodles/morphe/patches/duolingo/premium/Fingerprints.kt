@@ -50,7 +50,7 @@ fun getFeatureFingerprint(feature: String) = Fingerprint(
     filters = listOf(
         fieldAccess(
             name = feature,
-            definingClass = "Lcom/duolingo/core/subscription/models/SubscriptionFeatures;"
+            definingClass = "Lcom/duolingo/data/subscription/models/SubscriptionFeatures;"
         ),
         methodCall(
             name = "contains",

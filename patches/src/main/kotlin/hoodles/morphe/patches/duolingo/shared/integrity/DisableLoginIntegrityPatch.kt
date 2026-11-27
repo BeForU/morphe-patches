@@ -14,12 +14,22 @@ import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.formats.Instruction21c
 import com.android.tools.smali.dexlib2.iface.instruction.formats.Instruction22c
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
+import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
 @Suppress("unused")
 val disableLoginIntegrityPatch = bytecodePatch {
 
     execute {
-        val emptySignalRef = BasicLoginFingerprint.method.let {
+        val loginMethod = BasicLoginFingerprint.method.let {
+            if (it.indexOfFirstInstruction(Opcode.SGET_OBJECT) >= 0) it else {
+                val factory = BasicLoginFactoryFingerprint.method
+                check(it.indexOfFirstInstruction {
+                    getReference<MethodReference>()?.toString() == factory.toString()
+                } >= 0) { "Email login does not call the identified request factory" }
+                factory
+            }
+        }
+        val emptySignalRef = loginMethod.let {
             it.getInstruction<Instruction21c>(
                 it.indexOfFirstInstruction(Opcode.SGET_OBJECT)
             ).getReference<FieldReference>()

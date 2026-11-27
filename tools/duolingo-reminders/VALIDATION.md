@@ -1,4 +1,32 @@
-# Bundle validation — 2026-10-22
+# Bundle validation — 2026-11-27
+
+## Duolingo 6.106.7 / 1.47.0-mod.9
+
+- The original APKMirror 6.106.7 (2508) APKM had SHA-256
+  `5134a109a856a5aee554c5b1593bfdf5ee1a506c7572054acdbe30d779de5f65`.
+  Its base APK SHA-256 was `abd5a39e194ab888716954ca0cb4bba2c8cab8b13e3602ffe21f13b58bb95d8b`;
+  signature verification succeeded with certificate SHA-256
+  `1233ff6de4c70ef4d7deae54af15b167fc7cfd2539517bd2175870f3cb771731`.
+- `dist/patches-1.47.0-mod.9.mpp`, SHA-256
+  `eeb1663a213f852ae6c2229fb7c5dab1280363d94638692d162939e4f9f820b8`,
+  was built from this checkout's full source with pinned public Morphe build
+  dependencies, without the Hoodles repository or its release bundle. The
+  actual bundle loaded 80 public patches and included all five generated
+  Pairip extensions. Eight reminder coordinator scenarios passed.
+- The final full-source bundle applied the five Duolingo patches and
+  MicroG together to the original base with both SUPER and MAX using Manager
+  2.0.0's JVM patcher; each output serialized 35 DEX files and resources.
+  Reminder and Firebase identity bytecode audits passed for both outputs.
+- On the connected SM-F946N / Android 17, the final SUPER and MAX
+  outputs were separately loaded with `dalvikvm -Xverify:all`. The changed
+  reminder home and video feature classes were allocated without running
+  constructors; neither class nor its app-defined superclasses had `<clinit>`.
+  Firebase and login classes were loaded without initialization only. Device
+  temporary files were removed; the installed 6.102.4 app and data were not
+  changed. This probe is not a complete app startup or login test.
+- Actual app startup, login, server-side Premium/MAX features, and real
+  notification delivery have not been tested for 6.106.7. In particular the
+  historical local notification background-service limitation below remains.
 
 ## Duolingo FIS identity fix 1.47.0-mod.6 — 2026-10-23
 

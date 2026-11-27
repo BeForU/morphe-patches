@@ -10,11 +10,16 @@ param(
     [string]$JdkHome = $env:JAVA_HOME,
     [string]$AndroidSdk = $(if ($env:ANDROID_HOME) { $env:ANDROID_HOME } else { $env:ANDROID_SDK_ROOT }),
     [string]$PublicAssetCache,
+    [string]$Java17Home,
+    [ValidateRange(1, 128)][int]$MaxWorkers = 4,
     # Explicitly exercise the public build on machines without registry access.
     # This never bypasses the exact release/main commit parity check.
-    [switch]$ReleaseOverlay
+    [switch]$ReleaseOverlay,
+    # Fail instead of falling back to an upstream release bundle.
+    [switch]$FullSourceOnly
 )
 $ErrorActionPreference = 'Stop'
+if ($ReleaseOverlay -and $FullSourceOnly) { throw 'ReleaseOverlay and FullSourceOnly are mutually exclusive.' }
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $plan = Get-Content -LiteralPath $PlanPath -Raw | ConvertFrom-Json
 if ($plan.changed -isnot [bool] -or -not $plan.changed) { throw 'The sync plan has no prepared update to build.' }
@@ -88,7 +93,15 @@ try {
             try {
                 # GITHUB_TOKEN/GITHUB_ACTOR are inherited from the Actions job;
                 # never persist registry credentials into the repository.
-                Invoke-Checked $wrapper @('codegen', ':patches:buildAndroid', '--no-daemon')
+                $toolchainArguments = @("--max-workers=$MaxWorkers", '-Pkotlin.compiler.execution.strategy=in-process')
+                if ($Java17Home) {
+                    $Java17Home = (Resolve-Path -LiteralPath $Java17Home).Path
+                    $toolchainArguments += "-Porg.gradle.java.installations.paths=$Java17Home"
+                }
+                # Settings discovers generated extension projects during configuration,
+                # so codegen must finish before configuring the bundle build.
+                Invoke-Checked $wrapper (@('codegen', '--no-daemon') + $toolchainArguments)
+                Invoke-Checked $wrapper (@(':patches:buildAndroid', '--no-daemon') + $toolchainArguments)
                 $sourceBundle = Join-Path $repo "patches/build/libs/patches-$($plan.version).mpp"
                 if (-not (Test-Path -LiteralPath $sourceBundle)) { throw "Full source build did not produce $sourceBundle" }
                 Copy-Item -LiteralPath $sourceBundle -Destination $bundlePath
@@ -110,6 +123,9 @@ try {
         if ($fullSourceSucceeded) {
             $buildMode = 'full-source'
         } else {
+            if ($FullSourceOnly) {
+                throw 'The local source build or catalog export failed. Upstream release overlay is disabled.'
+            }
             Assert-ReleaseParity
             Write-Output 'Building the verified official-release overlay for this exact upstream commit.'
             $buildArguments = @{

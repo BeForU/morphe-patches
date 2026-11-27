@@ -3,7 +3,7 @@ group = "hoodles.morphe"
 patches {
     about {
         name = "Hoodles Morphe Patches (Modded)"
-        description = "Various patches for use with Morphe"
+        description = "Various patches for use with Morphe, including Duolingo 6.106.7"
         source = "https://github.com/BeForU/morphe-patches"
         author = "hoodles"
         contact = "na"

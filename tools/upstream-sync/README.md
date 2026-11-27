@@ -1,7 +1,14 @@
-# Automatic upstream synchronization
+# Historical upstream synchronization
+
+> **Paused:** the workflow has no scheduled trigger. This page describes the
+> legacy upstream merge process and does not describe the independent build.
+> Use [STANDALONE.md](STANDALONE.md) to build the current checkout without the
+> discontinued Hoodles upstream repository or its release bundle. A manual
+> run of the legacy workflow still fetches upstream and enforces its old gates.
+
 
 The workflow at [`.github/workflows/sync-upstream.yml`](../../.github/workflows/sync-upstream.yml)
-checks `hoo-dles/morphe-patches` **main** hourly. Its maintained template is
+previously checked `hoo-dles/morphe-patches` **main** hourly. Its template is
 [workflow.yml](workflow.yml); both copies must be kept identical. Inspect
 [Actions run history](https://github.com/BeForU/morphe-patches/actions/workflows/sync-upstream.yml)
 for the result of an actual scheduled or manual run.

@@ -16,26 +16,21 @@ combinations and device behavior remain untested. The guide patch also passed
 standalone application and DEX checks.
 See [implementation and validation](tools/instagram-guide/README.md).
 
-## Duolingo 6.102.4 and learning reminders
+## Duolingo 6.106.7 and learning reminders
 
-[Add this repository to Morphe Manager](https://morphe.software/add-source?github=BeForU/morphe-patches&name=Hoodles%20Morphe%20Patches%20%28Modded%29) · [Current version and download URL](patches-bundle.json) · [Current patch catalog](patches-list.json)
+This repository provides one complete **Hoodles Morphe Patches (Modded)** source: Duolingo patches, the optional learning reminder fallback, and universal patches including **MicroG integration** are in the same bundle. No separate Hoodles patch source or reminder add-on is needed. Morphe Manager and an original compatible APK are still required.
 
-This fork's remote source serves **Hoodles Morphe Patches (Modded)**. It combines the upstream Hoodles catalog with Duolingo **6.102.4** support, the login fingerprint fix from [upstream PR #1117](https://github.com/hoo-dles/morphe-patches/pull/1117), and `Restore learning reminders`. Select Duolingo patches and universal patches including `MicroG integration` from this one source. The release metadata and catalog linked above describe the bundle currently distributed to Manager.
+[Add this repository to Morphe Manager](https://morphe.software/add-source?github=BeForU/morphe-patches&name=Hoodles%20Morphe%20Patches%20%28Modded%29) · [Bundle metadata](patches-bundle.json) · [Patch catalog](patches-list.json)
 
-Fork versions use **`<upstream version>-mod.<revision>`**: for example, `1.47.0-mod.1` is the first custom revision based on upstream `1.47.0`, followed by `1.47.0-mod.2`. Incorporating upstream `1.48.0` starts at `1.48.0-mod.1`. Previously published bundles remain available as archives.
+1. Add `https://github.com/BeForU/morphe-patches` as a remote source in Morphe Manager, or update it if already added. The source name can be changed using **Sources → Rename**.
+2. Select an original Duolingo **6.106.7** APK and choose **Enable Premium**, **MicroG integration**, and, if wanted, **Restore learning reminders** from this source. The reminder patch is off by default; use Expert mode if needed. Choose SUPER or MAX in the Premium options.
+3. Disable duplicate Duolingo patches from other sources, then patch the original APK. Updating the source does not modify an already installed app. Keep learning notifications enabled in both Duolingo and Android.
 
-1. Open Morphe Manager's **Sources → + → Remote** and add `https://github.com/BeForU/morphe-patches`, or use the add-source link above. If this repository is already added as **Duolingo Learning Reminders** or **BeForU Morphe Patches**, tap its **Update** button. Confirm that the downloaded bundle is **Hoodles Morphe Patches (Modded)** with the version shown in [release metadata](patches-bundle.json). Manager preserves a saved custom source name. If the source card still shows the old label, use its pencil **Rename** action under **Sources** and enter **Hoodles Morphe Patches (Modded)**; the source does not need to be removed and added again.
-2. Choose an original Duolingo **6.102.4** APK. In this source, select **Enable Premium**, **MicroG integration**, and **Restore learning reminders**, plus any other Duolingo patches you want. The reminder patch is off by default; enable Expert mode if needed to show and select it.
-3. Clear Duolingo patch selections from the old **Hoodles Morphe Patches 1.47.0** source and any old local reminder source. Select each patch once from this updated source. To save this choice, long-press Duolingo's home card, open **Patch sources**, and keep only this source enabled for Duolingo. Other sources can remain installed for other apps.
-4. Open Duolingo's home screen after installation and keep learning notifications enabled in Duolingo and Android.
+A local `.mpp` can also be imported, but local sources do not update automatically. The endpoint and download link above describe the version actually published on the repository's `main` branch; changes in an unpushed checkout are not available remotely.
 
-Remote sources receive published bundle updates through this repository's `patches-bundle.json`. An existing local `.mpp` source does not become remote automatically: add the repository once, then disable or delete the old local reminder source to avoid selecting it twice. Local import under **Sources → + → Local** is also supported, but future updates then require another file import.
+The Hoodles upstream sync is paused. The complete source in this repository can be built independently of that upstream repository and its release bundle; see [standalone build instructions](tools/upstream-sync/STANDALONE.md). The normal build uses Morphe's Gradle plugin and libraries; an alternative builds pinned public sources for those tooling dependencies without GitHub Packages credentials. Neither route requires an older Hoodles patch bundle. Existing historical overlay and sync tools are retained for reference, not required for standalone builds.
 
-The [upstream sync workflow](https://github.com/BeForU/morphe-patches/actions/workflows/sync-upstream.yml) checks `hoo-dles/morphe-patches` main hourly. It merges changed source, builds and verifies a new bundle, and publishes the source, `.mpp`, catalog, and Manager metadata together. It preserves the reminder patch, **Hoodles Morphe Patches (Modded)** name, and `-mod` version rule. Unchanged upstream commits do not create releases. Merge conflicts, changes to the validated Duolingo targets, or failed verification stop publication. Use **Actions → Sync upstream and publish modded patches → Run workflow → Rebuild** to request a fresh custom revision manually. See [how synchronization works](tools/upstream-sync/README.md) for the build and publication rules.
-
-See [validation results](tools/duolingo-reminders/VALIDATION.md) for the engines and patch combinations actually checked. Build and publishing instructions are in [tools/duolingo-reminders](tools/duolingo-reminders/README.md). The archived [1.48.0 reminder-only bundle](https://raw.githubusercontent.com/BeForU/morphe-patches/main/dist/duolingo-reminders-1.48.0.mpp) targets 6.102.4, and [1.0.0](https://raw.githubusercontent.com/BeForU/morphe-patches/main/dist/duolingo-reminders-1.0.0.mpp) targets 6.98.4.
-
-If `Enable Premium` fails with `BasicLoginFingerprint` while the report lists **Hoodles Morphe Patches 1.47.0**, that patch came from the old source. The 1.48.0 reminder-only bundle did not replace its login dependency. Update this repository and select all Duolingo patches from **Hoodles Morphe Patches (Modded)** to use the corrected dependency together with the reminder fallback.
+See [validation results](tools/duolingo-reminders/VALIDATION.md) for the exact APK, patch combinations and device checks performed, including remaining limitations. Older `.mpp` files in `dist` are archives.
 
 ## Upstream hoodles Morphe Patches catalog
 

@@ -1,6 +1,10 @@
 rootProject.name = "morphe-patches"
 
 pluginManagement {
+    // Optional public-source build of the tooling; normal registry builds are unchanged.
+    providers.environmentVariable("MORPHE_PUBLIC_BUILD_SOURCES").orNull?.let {
+        includeBuild("$it/gradle-plugin")
+    }
     repositories {
         gradlePluginPortal()
         google()
@@ -31,3 +35,18 @@ settings {
 }
 
 include(":patches:stub")
+
+providers.environmentVariable("MORPHE_PUBLIC_BUILD_SOURCES").orNull?.let { sourceRoot ->
+    val directory = file(sourceRoot)
+    includeBuild(directory.resolve("patcher")) {
+        dependencySubstitution {
+            substitute(module("app.morphe:morphe-patcher")).using(project(":"))
+        }
+    }
+    includeBuild(directory.resolve("patches-library")) {
+        dependencySubstitution {
+            substitute(module("app.morphe:morphe-patches-library")).using(project(":patch-library"))
+            substitute(module("app.morphe:morphe-extensions-library")).using(project(":extension-library"))
+        }
+    }
+}
